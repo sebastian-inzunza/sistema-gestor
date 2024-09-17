@@ -17,5 +17,7 @@ public interface RolesRepository extends JpaRepository<RolesEntity, Long> {
     @Query("SELECT rol FROM RolesEntity rol WHERE rol.nombre =:nombre ")
     Optional<RolesEntity> obtenerRolPorNombre(@Param("nombre") String nombre);
 
+    boolean existsByNombre(String email);
+
 
 }

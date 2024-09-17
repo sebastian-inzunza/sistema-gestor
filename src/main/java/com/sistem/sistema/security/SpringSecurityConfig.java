@@ -57,6 +57,7 @@ public class SpringSecurityConfig{
                 });
                 authz
                     .requestMatchers(HttpMethod.POST, "/api/usuario/crear").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/usuario/crear/admin").hasRole("ADMIN")
                     .anyRequest().authenticated();
                 }
             )

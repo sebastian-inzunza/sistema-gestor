@@ -3,6 +3,7 @@ package com.sistem.sistema.entity;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
@@ -34,11 +35,14 @@ public class EnpointsEntity {
     private String url;
 
     @Basic
+    @Column(name = "nombre")
+    private String nombre;
+
+    @Basic
     @Column(name = "method")
     private String method;
 
-    // @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @JsonIgnoreProperties({"endpoints",  "handler", "hibernateLazyInitializer"})
     @ManyToMany(mappedBy = "endpoints", fetch = FetchType.EAGER)
     List<RolesEntity> roles;

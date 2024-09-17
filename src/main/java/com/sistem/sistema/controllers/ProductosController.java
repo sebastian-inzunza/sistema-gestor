@@ -41,7 +41,6 @@ public class ProductosController {
 
     @PostMapping("crear")
     public ResponseEntity<Object> CrearProductos(@RequestBody ProductosEntity productosEntity) {
-        System.out.println(productosEntity.toString());
 
         if(productosSevice.isProductExist(productosEntity.getNombre())){
             throw new NotFoundException(String.format("El producto con nombre '%s'   ya se encuentra registrado", productosEntity.getNombre()));
