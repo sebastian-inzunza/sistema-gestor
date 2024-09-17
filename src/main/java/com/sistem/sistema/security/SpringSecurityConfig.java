@@ -1,5 +1,7 @@
 package com.sistem.sistema.security;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,14 +14,20 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.sistem.sistema.entity.EnpointsEntity;
+import com.sistem.sistema.entity.RolesEntity;
 import com.sistem.sistema.security.filter.JwtAuthentificationFilter;
 import com.sistem.sistema.security.filter.JwtValidationFilter;
+import com.sistem.sistema.services.EndpointsService;
 
 @Configuration
 public class SpringSecurityConfig{
 
     @Autowired
     AuthenticationConfiguration authenticationConfiguration;
+
+    @Autowired
+    EndpointsService endpointsService;
 
     @Bean
     AuthenticationManager authenticationManager () throws Exception{
@@ -33,12 +41,25 @@ public class SpringSecurityConfig{
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
-        return http.authorizeHttpRequests((authz)-> authz
-            .requestMatchers(HttpMethod.GET, "/api/usuario").permitAll()
-            .requestMatchers(HttpMethod.POST, "/api/usuario").permitAll()
-            .requestMatchers(HttpMethod.POST, "/api/usuario/admin").hasRole("ADMIN")
-            .requestMatchers(HttpMethod.POST, "/api/usuario/admin").hasRole("ADMIN")
-                .anyRequest().authenticated())
+        List<EnpointsEntity> endpoints = endpointsService.ObtenerEndpoints();
+        
+        return http.authorizeHttpRequests(
+            (authz)->  {
+                endpoints.forEach(path ->{
+                    if(!path.getRoles().isEmpty()){
+                        String[] roles = path.getRoles().stream().map(RolesEntity::getNombre)
+                                        .map(name->{
+                                            return name.split("_")[1]; 
+                                        })
+                                        .toArray(String[]::new);
+                        authz.requestMatchers(HttpMethod.valueOf(path.getMethod()), path.getUrl()).hasAnyRole(roles);
+                    }
+                });
+                authz
+                    .requestMatchers(HttpMethod.POST, "/api/usuario/crear").permitAll()
+                    .anyRequest().authenticated();
+                }
+            )
             .addFilter(new JwtAuthentificationFilter(authenticationManager()))
             .addFilter(new JwtValidationFilter(authenticationManager()))
             .csrf(config -> config.disable())

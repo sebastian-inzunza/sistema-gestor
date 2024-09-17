@@ -16,6 +16,10 @@ public class RolesService {
     RolesRepository rolesRepository;
 
     public List<RolesEntity> ObtenerRoles(){
+        return rolesRepository.obtenerRoles();
+    }
+
+    public List<RolesEntity> ObtenerRolesAdmin(){
         return rolesRepository.findAll();
     }
 

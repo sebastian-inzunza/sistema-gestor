@@ -34,14 +34,14 @@ public class UsuariosController {
     RolesService rolesService;
 
 
-    @GetMapping("")
+    @GetMapping("obtener")
     public List<UsuarioEntity> ObtenerUsuarios(  
     ) {
         List<UsuarioEntity> usuario = usuarioService.ObtenerUsuarios();
         return usuario;  
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("obtener/{id}")
     public UsuarioEntity ObtenerUsuarioId(
         @PathVariable(name = "id") Long id    
     ) {
@@ -49,7 +49,7 @@ public class UsuariosController {
         return usuario;  
     }
 
-    @PostMapping("")
+    @PostMapping("crear")
     public ResponseEntity<Object> CrearUsuario(@RequestBody UsuarioEntity entity) {
         
         if(usuarioService.isEmailExist(entity.getEmail())){
@@ -67,7 +67,7 @@ public class UsuariosController {
         return ResponseEntity.ok().body("Usuario " + usuario.getNombre() + " registrado con exito");
     }
     
-    @PostMapping("/admin")
+    @PostMapping("crear/admin")
     public ResponseEntity<Object> CrearUsuarioAdmin(@RequestBody UsuarioEntity entity) {
 
         if(usuarioService.isEmailExist(entity.getEmail())){

@@ -25,13 +25,13 @@ public class ProductosController {
     @Autowired
     ProductosSevice productosSevice;
 
-    @GetMapping("")
+    @GetMapping("obtener")
     public List<ProductosEntity> obtenerProductos() {
         List<ProductosEntity> productos = productosSevice.obtenerProductos();
         return productos;
     }
 
-    @GetMapping("{id}")
+    @GetMapping("obtener/{id}")
     public ProductosEntity ObtenerProducto(
         @PathVariable(name = "id") Long productoId ) {
         
@@ -39,7 +39,7 @@ public class ProductosController {
         return usuarioEncontrado;
     }
 
-    @PostMapping("")
+    @PostMapping("crear")
     public ResponseEntity<Object> CrearProductos(@RequestBody ProductosEntity productosEntity) {
         System.out.println(productosEntity.toString());
 

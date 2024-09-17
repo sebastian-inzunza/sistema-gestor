@@ -25,12 +25,12 @@ public class CategoriasController {
     @Autowired
     CategoriasService categoriasService;
 
-    @GetMapping("")
+    @GetMapping("obtener")
     public List<CategoriasEntity> ObtenerCategorias() {
         return categoriasService.obtenerCategorias();
     }
 
-    @PostMapping("")
+    @PostMapping("crear")
     public ResponseEntity<Object> CrearCategoria(@RequestBody CategoriasEntity entity) {
 
         if(categoriasService.isExistcategoria(entity.getNombre())){
