@@ -46,5 +46,10 @@ public class UsuarioService {
         usuario.setEstatus(true);
 
         return usuarioRepository.save(usuario);
+    }
+
+    @Transactional(readOnly = false)
+    public UsuarioEntity  EditarUsuario(UsuarioEntity usuario){
+        return usuarioRepository.save(usuario);
     } 
 }

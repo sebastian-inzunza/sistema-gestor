@@ -14,12 +14,16 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PutMapping;
+
 
 
 
@@ -92,5 +96,29 @@ public class UsuariosController {
         return ResponseEntity.ok().body("Administrador " + usuario.getNombre() + " registrado con exito");
     }
     
+    @PutMapping("editar/{id}")
+    public ResponseEntity<Object> putMethodName(@PathVariable Long id, @RequestBody UsuarioEntity usuario) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        
+        if(!usuario.getEmail().equals(auth.getPrincipal())){
+            throw new NotFoundException("Este usuario no puede ser editado o no cuentas con los permisos necesarios");
+        }
+
+        UsuarioEntity usuarioEncontrado = usuarioService.ObtenerUsuarioId(id).orElseThrow(() -> new NotFoundException("Usuario no encontado"));
+        
+
+        usuarioEncontrado.setApellidos(usuario.getApellidos());
+        usuarioEncontrado.setNombre(usuario.getNombre());
+
+        usuarioService.EditarUsuario(usuarioEncontrado);
+
+
+        return ResponseEntity.ok().body("Usuario editado");
+    }
+
+    //Restaurar contraseña
+    
+
+    //Editar Rol (Solo administradores pueden hacer esta acción)
     
 }

@@ -42,6 +42,10 @@ public class UsuarioEntity {
     private String nombre;
 
     @Basic
+    @Column(name = "apellidos")
+    private String apellidos;
+
+    @Basic
     @Column(name = "email")
     String email;
 
