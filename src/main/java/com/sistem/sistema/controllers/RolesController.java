@@ -5,10 +5,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sistem.sistema.entity.EnpointsEntity;
 import com.sistem.sistema.entity.RolesEntity;
+import com.sistem.sistema.exception.NotFoundException;
 import com.sistem.sistema.services.EndpointsService;
 import com.sistem.sistema.services.RolesService;
 
-import jakarta.ws.rs.NotFoundException;
 
 import java.util.List;
 
@@ -53,6 +53,10 @@ public class RolesController {
 
         if(rolesService.isRolExist(rol.getNombre())){
             throw new NotFoundException(String.format("El rol '%s' ya existe", nombre_rol));
+        }
+
+        if( rol.getEndpoints() == null || rol.getEndpoints().isEmpty() ){
+            throw new NotFoundException("Para poder crear rol debes seleccionar por lo menos una funcionalidad");
         }
 
         rolesService.CrearRoles(rol);

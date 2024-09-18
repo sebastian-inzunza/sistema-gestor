@@ -37,7 +37,7 @@ public class RolesService {
 
     @Transactional(readOnly = true)
     public boolean isRolExist (String nombre_rol){
-        return  rolesRepository.existsByNombre(nombre_rol);
+        return rolesRepository.existsByNombre(nombre_rol);
     }
 
 
