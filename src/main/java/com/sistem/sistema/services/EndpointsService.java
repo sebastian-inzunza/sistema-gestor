@@ -17,4 +17,8 @@ public class EndpointsService {
     public List<EnpointsEntity> ObtenerEndpoints(){
         return endpointsRepository.findAll();
     }
+
+    public void EliminarEndpointRoles(Long rolId){
+        endpointsRepository.eliminarEndpoindsRoles(rolId);
+    }
 }

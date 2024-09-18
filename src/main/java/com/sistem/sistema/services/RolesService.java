@@ -16,6 +16,12 @@ public class RolesService {
     @Autowired
     RolesRepository rolesRepository;
 
+
+    @Transactional(readOnly = true)
+    public Optional<RolesEntity> ObtenerRolPorId(Long id){
+        return rolesRepository.findById(id);
+    }
+
     @Transactional(readOnly = true)
     public List<RolesEntity> ObtenerRoles(){
         return rolesRepository.obtenerRoles();

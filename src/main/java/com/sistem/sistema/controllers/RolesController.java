@@ -17,6 +17,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
 
 
 @RestController
@@ -39,9 +42,11 @@ public class RolesController {
         return rolesService.ObtenerRolesAdmin();
     }
     
-    @GetMapping("obtener/endpoints")
-    public List<EnpointsEntity> ObtenerEmdpoints () {
-        return endpointsService.ObtenerEndpoints();
+   
+    @GetMapping("obtener/{id}")
+    public RolesEntity ObtenerRol(@PathVariable Long id) {
+        RolesEntity rolEncontrado = rolesService.ObtenerRolPorId(id).orElseThrow(() -> new NotFoundException("El rol a editar no existe o fue eliminado"));
+        return rolEncontrado;
     }
     
 
@@ -63,5 +68,34 @@ public class RolesController {
         return ResponseEntity.ok().body(String.format("El rol '%s' fue creado con exito", nombre_rol));
     }
     
+
+    @PutMapping("editar/{id}")
+    public ResponseEntity<Object> EditarRol(@PathVariable Long id, @RequestBody RolesEntity rol) {
+        
+        RolesEntity rolEncontrado = rolesService.ObtenerRolPorId(id).orElseThrow(() -> new NotFoundException("El rol a editar no existe o fue eliminado"));
+
+
+        String nombre_rol = rol.getNombre();
+        rol.setNombre("ROLE_" + rol.getNombre().toUpperCase());
+
+        if(!rol.getNombre().equals(rolEncontrado.getNombre()) && rolesService.isRolExist(rol.getNombre())){
+            throw new NotFoundException(String.format("El rol '%s' ya existe", nombre_rol));
+        }
+
+        if( rol.getEndpoints() == null || rol.getEndpoints().isEmpty() ){
+            throw new NotFoundException("Para poder crear rol debes seleccionar por lo menos una funcionalidad");
+        }
+
+        endpointsService.EliminarEndpointRoles(rolEncontrado.getRolId());
+        rolesService.CrearRoles(rol);
+
+        return ResponseEntity.ok().body("Rol editado");
+    }
+
+    @GetMapping("obtener/endpoints")
+    public List<EnpointsEntity> ObtenerEndpoints () {
+        return endpointsService.ObtenerEndpoints();
+    }
+
     
 }
