@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
 
 
 
@@ -43,5 +46,18 @@ public class CategoriasController {
         return ResponseEntity.ok().body(String.format("La categoria '%s' fue creado con exito", categoria.getNombre()));
     }
     
+    @PutMapping("edita/{id}")
+    public ResponseEntity<Object> EditarCategoria(@PathVariable Long id, @RequestBody CategoriasEntity categoria) {        
+        CategoriasEntity categoriaEncontrada = categoriasService.obtenerCategoriaPorId(id).orElseThrow(() -> new NotFoundException("No se encontro categoria"));
+
+        if (!categoriaEncontrada.getNombre().equals(categoria.getNombre()) && categoriasService.isExistcategoria(categoria.getNombre())) {
+            throw new NotFoundException(String.format("La categoria '%s' ya existe", categoria.getNombre()));
+        }
+
+        categoriaEncontrada.setNombre(categoria.getNombre());
+        categoriasService.editarCategoria(categoriaEncontrada);
+
+        return ResponseEntity.ok().body("Categora editada");
+    }
     
 }
