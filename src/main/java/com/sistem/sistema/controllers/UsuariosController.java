@@ -97,7 +97,7 @@ public class UsuariosController {
     }
     
     @PutMapping("editar/{id}")
-    public ResponseEntity<Object> putMethodName(@PathVariable Long id, @RequestBody UsuarioEntity usuario) {
+    public ResponseEntity<Object> EditarUsuario(@PathVariable Long id, @RequestBody UsuarioEntity usuario) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         
         if(!usuario.getEmail().equals(auth.getPrincipal())){
@@ -119,6 +119,18 @@ public class UsuariosController {
     //Restaurar contraseña
     
 
-    //Editar Rol (Solo administradores pueden hacer esta acción)
-    
+    @PutMapping("editar/rol/{id}")
+    public ResponseEntity<Object> EditarRolUsuario(@PathVariable Long id, @RequestBody UsuarioEntity usuario) {
+
+        UsuarioEntity usuarioEncontrado = usuarioService.ObtenerUsuarioId(id).orElseThrow(() -> new NotFoundException("Usuario no encontado"));
+
+        if(usuario.getRoles() == null || usuario.getRoles().isEmpty()){
+            throw new NotFoundException("El usuario debe de tener por lo menos 1 rol asignado");
+        }
+
+        rolesService.EliminarRoles(usuarioEncontrado.getUsuarioId());
+        usuarioService.EditarUsuario(usuarioEncontrado);
+        
+        return ResponseEntity.ok().body("Roles de usuarios editados");
+    }
 }

@@ -47,5 +47,9 @@ public class RolesService {
     }
 
 
+    public void EliminarRoles(Long usuarioId){
+        rolesRepository.eliminarUsuariosRoles(usuarioId);
+    }
+
 
 }

@@ -65,6 +65,7 @@ public class SpringSecurityConfig{
                 authz
                     .requestMatchers(HttpMethod.POST, "/api/usuario/crear").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/usuario/crear/admin").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.PUT, "/api/usuario/editar/rol/{id}").hasRole("ADMIN")
                     .anyRequest().authenticated();
                 }
             )
