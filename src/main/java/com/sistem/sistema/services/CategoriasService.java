@@ -29,4 +29,8 @@ public class CategoriasService {
     public boolean isExistcategoria(String nombre){
         return categoriasRepository.existsByNombre(nombre);
     }
+
+    public void eliminarProductoCategoria(Long productoId){
+        categoriasRepository.eliminarProductoCategoria(productoId);
+    }
 }

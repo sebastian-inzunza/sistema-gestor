@@ -30,27 +30,27 @@ public class ProductosEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "productoId")
-    Long productoId;
+    private Long productoId;
 
     @Basic
     @Column(name = "nombre", unique = true)
-    String nombre;
+    private String nombre;
 
     @Basic
     @Column(name = "precio")
-    Double precio;
+    private Double precio;
 
     @Basic
     @Column(name = "descripcion")
-    String descripcion;
+    private String descripcion;
 
     @Basic
     @Column(name = "imagen")
-    String imagen;
+    private String imagen;
 
     @Basic
     @Column(name = "fecha")
-    Timestamp fecha;
+    private Timestamp fecha;
 
     @JsonIgnoreProperties({"productos", "handler", "hibernateLazyInitializer"})
     @OneToOne()

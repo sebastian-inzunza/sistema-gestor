@@ -117,7 +117,7 @@ public class UsuariosController {
     }
 
     //Restaurar contraseña
-    
+
 
     @PutMapping("editar/rol/{id}")
     public ResponseEntity<Object> EditarRolUsuario(@PathVariable Long id, @RequestBody UsuarioEntity usuario) {
@@ -129,6 +129,8 @@ public class UsuariosController {
         }
 
         rolesService.EliminarRoles(usuarioEncontrado.getUsuarioId());
+        usuarioEncontrado.setRoles(usuario.getRoles());
+
         usuarioService.EditarUsuario(usuarioEncontrado);
         
         return ResponseEntity.ok().body("Roles de usuarios editados");

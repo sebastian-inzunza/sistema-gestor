@@ -41,5 +41,10 @@ public class ProductosSevice {
         return productosRepository.save(producto);
     }
 
+    @Transactional(readOnly = false)
+    public ProductosEntity editarProductos(ProductosEntity producto){
+        return productosRepository.save(producto);
+    }
+
 
 }

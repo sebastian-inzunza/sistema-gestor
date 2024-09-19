@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sistem.sistema.entity.ProductosEntity;
 import com.sistem.sistema.exception.NotFoundException;
+import com.sistem.sistema.services.CategoriasService;
 import com.sistem.sistema.services.ProductosSevice;
 
 import java.util.List;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PutMapping;
+
 
 
 
@@ -26,6 +29,9 @@ public class ProductosController {
     
     @Autowired
     ProductosSevice productosSevice;
+
+    @Autowired 
+    CategoriasService categoriasService;
 
     @GetMapping("obtener")
     public List<ProductosEntity> obtenerProductos() {
@@ -50,6 +56,27 @@ public class ProductosController {
 
         ProductosEntity producto = productosSevice.crearProductos(productosEntity);
         return ResponseEntity.ok().body("El producto '" + producto.getNombre() + "'' se ha registrado con exito");
+    }
+
+    @PutMapping("editar/{id}")
+    public ResponseEntity<Object> editarProducto(@PathVariable Long id, @RequestBody ProductosEntity producto) {
+        
+        ProductosEntity productosEncontrados = productosSevice.obtenerProductoPorId(id).orElseThrow(() -> new NotFoundException("No se encontro el usuario"));
+
+        if(!producto.getNombre().equals(productosEncontrados.getNombre()) && productosSevice.isProductExist(producto.getNombre())){
+            throw new NotFoundException(String.format("El producto '%s' ya se encuentra registrado", producto.getNombre()));
+        }
+
+        productosEncontrados.setNombre(producto.getNombre());
+        productosEncontrados.setPrecio(producto.getPrecio());
+        productosEncontrados.setDescripcion(producto.getDescripcion());
+        
+        categoriasService.eliminarProductoCategoria(productosEncontrados.getProductoId());
+
+        productosEncontrados.setCategorias(producto.getCategorias());
+        productosSevice.editarProductos(productosEncontrados);
+        
+        return ResponseEntity.ok().body("Se edito el producto");
     }
     
 }
