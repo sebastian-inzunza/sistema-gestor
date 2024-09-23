@@ -17,6 +17,9 @@ public interface RolesRepository extends JpaRepository<RolesEntity, Long> {
     @Query("SELECT rol FROM RolesEntity rol WHERE rol.nombre!='ROLE_ADMIN'")
     List<RolesEntity> obtenerRoles();
 
+    @Query("SELECT rol FROM RolesEntity rol JOIN FETCH rol.endpoints WHERE rol.rolId=:rolId ")
+    Optional<RolesEntity> obtenerRolPorId(@Param("rolId") Long rolId);
+
     @Query("SELECT rol FROM RolesEntity rol WHERE rol.nombre =:nombre ")
     Optional<RolesEntity> obtenerRolPorNombre(@Param("nombre") String nombre);
 

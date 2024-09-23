@@ -19,7 +19,7 @@ public class RolesService {
 
     @Transactional(readOnly = true)
     public Optional<RolesEntity> ObtenerRolPorId(Long id){
-        return rolesRepository.findById(id);
+        return rolesRepository.obtenerRolPorId(id);
     }
 
     @Transactional(readOnly = true)
