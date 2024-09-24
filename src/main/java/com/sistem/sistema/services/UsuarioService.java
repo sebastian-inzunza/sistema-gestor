@@ -34,6 +34,12 @@ public class UsuarioService {
     }
 
     @Transactional(readOnly = true)
+    public Optional<UsuarioEntity> ObtenerUsuarioEmail (String email){
+        Optional<UsuarioEntity> usuarioEncontrado = usuarioRepository.obtenerUsuarioPorEmail(email);
+        return usuarioEncontrado;
+    }
+
+    @Transactional(readOnly = true)
     public boolean isEmailExist (String email){
         return  usuarioRepository.existsByEmail(email);
     }

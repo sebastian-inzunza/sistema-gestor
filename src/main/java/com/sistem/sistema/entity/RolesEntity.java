@@ -42,7 +42,7 @@ public class RolesEntity {
     @ManyToMany(mappedBy = "roles")
     List<UsuarioEntity> usuarios;
 
-    // @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @JsonIgnoreProperties({"roles", "handler", "hibernateLazyInitializer"})
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

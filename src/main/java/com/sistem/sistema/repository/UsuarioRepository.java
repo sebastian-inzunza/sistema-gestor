@@ -18,6 +18,9 @@ public interface UsuarioRepository extends JpaRepository<UsuarioEntity, Long> {
     @Query("SELECT usr FROM UsuarioEntity usr WHERE usr.usuarioId=:id")
     Optional<UsuarioEntity> obtenerUsuarioPorId(@Param("id") Long id);
 
+    @Query("SELECT usr FROM UsuarioEntity usr WHERE usr.email=:email")
+    Optional<UsuarioEntity> obtenerUsuarioPorEmail(@Param("email") Long email);
+
     // @Query("SELECT new com.sistem.sistema.models.UsuarioDTO( usr.usuarioId, usr.nombre, usr.email, usr.estatus, usr.fecha) FROM UsuarioEntity usr WHERE usr.email=:email")
     // Optional<UsuarioDTO> obtenerUsuarioPorEmail(@Param("email") String email);
 

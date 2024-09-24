@@ -61,4 +61,5 @@ public class ProductosEntity {
         uniqueConstraints = {@UniqueConstraint(columnNames = {"productoId", "categoriaId"})}
     )
     private CategoriasEntity categorias;
+
 }
