@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+
 
 
 
@@ -57,27 +59,55 @@ public class OrdenesController {
         return ResponseEntity.ok().body("Orden creada");
     }
     
+    @PutMapping("agregar/productos/{ordenId}")
+    public ResponseEntity<Object> AgregarProductos(@PathVariable Long ordenId, @RequestBody OrdenesEntity orden) {
+        OrdenesEntity ordenEncontrada = ordenesService.ObtenerPorId(ordenId).orElseThrow(()-> new NotFoundException("Orden no encontrada"));
+
+        if(ordenEncontrada.getEstatus().equals(OrdenEstatus.CERRADO.toString())){
+            throw new NotFoundException("La orden ya fue cerrada y no se puede agregar y/o eiminar productos");
+        }
+
+        System.out.println("Size " + orden.getProductosOrden().size());
+        ordenEncontrada.setProductosOrden(orden.getProductosOrden());
+        ordenesService.EditarProductosOrdenes(ordenEncontrada);
+        
+        return ResponseEntity.ok().body("Productos Agregados");
+    }
+
     @SuppressWarnings("static-access")
     @PutMapping("/lista")
-    public ResponseEntity<Object> CambiarEstatusListo( @RequestParam(required = true) Long ordenId) throws Exception {
+    public ResponseEntity<Object> OrdenLista( @RequestParam(required = true) Long ordenId) throws Exception {
         OrdenesEntity ordene = ordenesService.ObtenerPorId(ordenId).orElseThrow(()-> new NotFoundException("No se encontro la orden"));
+        ordenesService.CambiarEstatus(ordene.getOrdenId(), ordenEstatus.LISTO.toString());
 
         if(ordene.getLlevar()){
             ordenesService.CambiarEstatus(ordene.getOrdenId(), ordenEstatus.CERRADO.toString());
-        }else{
-            ordenesService.CambiarEstatus(ordene.getOrdenId(), ordenEstatus.LISTO.toString());
         }
+        
+        
         return ResponseEntity.ok().body("Orden Lista");
     }
 
     @SuppressWarnings("static-access")
     @PutMapping("/cerrar")
-    public ResponseEntity<Object> CerrarOrden( @RequestParam(required = true) Long ordenId) {
+    public ResponseEntity<Object> OrdenCerrada( @RequestParam(required = true) Long ordenId) {
         OrdenesEntity ordene = ordenesService.ObtenerPorId(ordenId).orElseThrow(()-> new NotFoundException("No se encontro la orden"));
 
         ordenesService.CambiarEstatus(ordene.getOrdenId(), ordenEstatus.CERRADO.toString());
 
         return ResponseEntity.ok().body("Orden Cerrada");
     }
+
+    @SuppressWarnings("static-access")
+    @PutMapping("/cancelar")
+    public ResponseEntity<Object> OrdenCancelada( @RequestParam(required = true) Long ordenId) {
+        OrdenesEntity ordene = ordenesService.ObtenerPorId(ordenId).orElseThrow(()-> new NotFoundException("No se encontro la orden"));
+
+        ordenesService.CambiarEstatus(ordene.getOrdenId(), ordenEstatus.CANCELADO.toString());
+
+        return ResponseEntity.ok().body("Orden Cancelada");
+    }
+
+
 
 }

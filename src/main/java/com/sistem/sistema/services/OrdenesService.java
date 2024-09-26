@@ -68,6 +68,34 @@ public class OrdenesService {
             ordenesProductosRepository.save(ordenProducto);
         });
     }
+    
+    @SuppressWarnings("static-access")
+    @Transactional(readOnly = false)
+    public void EditarProductosOrdenes(OrdenesEntity orden){
+        orden.setTotal(0D);
+        orden.getProductosOrden().forEach(producto->{
+            OrdenesProductosEntity ordenProducto = new OrdenesProductosEntity();
+
+            orden.setTotal( orden.getTotal() + producto.getCantidad() * producto.getPrecio());
+
+            if (producto.getOrdenProductoId() != null) {  
+                ordenProducto = ordenesProductosRepository.findById(producto.getOrdenProductoId()).get();              
+            }
+
+            
+            ordenProducto.setOrdenId(orden.getOrdenId());
+            ordenProducto.setProductoId(producto.getProductoId());
+            ordenProducto.setCantidad(producto.getCantidad());
+            
+            System.out.println(ordenProducto.toString());
+            
+            ordenesProductosRepository.save(ordenProducto);
+            
+        });
+
+        orden.setEstatus(ordenEstatus.ESPERANDO.toString());
+        ordenesRepository.save(orden);
+    }
 
     @Transactional(readOnly = true)
     public boolean OrdenIsExist(String nombre){
@@ -84,11 +112,21 @@ public class OrdenesService {
         return ordenesRepository.ObtenerPorId(id);
     }
 
+    @SuppressWarnings("static-access")
     @Transactional(readOnly = false)
     public void CambiarEstatus(Long ordenId, String estatus){
 
-        System.out.println("[ ID: "+ ordenId + ", estatus: " + estatus + "]");
         OrdenesEntity orden = ObtenerPorId(ordenId).orElseThrow(()-> new NotFoundException("No se encontro la orden"));
+
+        if(estatus.equals(ordenEstatus.LISTO.toString())){
+            List<OrdenesProductosEntity> productos = ordenesProductosRepository.obtenerInformacion(orden.getOrdenId());
+            
+            productos.forEach(producto ->{
+                producto.setAtendido(true);
+                ordenesProductosRepository.save(producto);
+            });
+        }
+        
         orden.setEstatus(estatus);
         ordenesRepository.save(orden);
 
@@ -105,7 +143,5 @@ public class OrdenesService {
 
         return ordenes;
     }
-
-   
 }
 

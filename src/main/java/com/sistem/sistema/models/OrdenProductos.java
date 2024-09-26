@@ -1,19 +1,31 @@
 package com.sistem.sistema.models;
 
 public class OrdenProductos {
+    private Long ordenProductoId;
     private Long productoId;
     private String producto;
     private Integer cantidad;
     private Double precio;
+    private Boolean atendido;
 
     public OrdenProductos() {
     }
 
-    public OrdenProductos(Long productoId, String producto, Integer cantidad, Double precio) {
+    public OrdenProductos(Long ordenProductoId, Long productoId, String producto, Integer cantidad, Double precio, Boolean atendido) {
+        this.ordenProductoId = ordenProductoId;
         this.productoId = productoId;
         this.producto = producto;
         this.cantidad = cantidad;
         this.precio = precio;
+        this.atendido = atendido;
+    }
+
+    public Long getOrdenProductoId() {
+        return ordenProductoId;
+    }
+
+    public void setOrdenProductoId(Long ordenProductoId) {
+        this.ordenProductoId = ordenProductoId;
     }
 
     public Long getProductoId() {
@@ -43,12 +55,18 @@ public class OrdenProductos {
         this.precio = precio;
     }
 
+    public Boolean getAtendido() {
+        return atendido;
+    }
+
+    public void setAtendido(Boolean atendido) {
+        this.atendido = atendido;
+    }
+
     @Override
     public String toString() {
         return "OrdenProductos [producto=" + producto + ", cantidad=" + cantidad + ", precio=" + precio + "]";
     }
 
- 
-
-    
+   
 }

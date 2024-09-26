@@ -33,4 +33,8 @@ public class OrdenesProductosEntity {
     @Basic
     @Column(name = "cantidad")
     private Integer cantidad;
+    
+    @Basic
+    @Column(name = "atendido")
+    private boolean atendido;
 }
