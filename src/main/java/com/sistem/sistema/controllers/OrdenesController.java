@@ -64,11 +64,11 @@ public class OrdenesController {
         OrdenesEntity ordenEncontrada = ordenesService.ObtenerPorId(ordenId).orElseThrow(()-> new NotFoundException("Orden no encontrada"));
 
         if(ordenEncontrada.getEstatus().equals(OrdenEstatus.CERRADO.toString())){
-            throw new NotFoundException("La orden ya fue cerrada y no se puede agregar y/o eiminar productos");
+            throw new NotFoundException("La orden ya fue cerrada y no se puede agregar y/o eliminar productos");
         }
 
-        System.out.println("Size " + orden.getProductosOrden().size());
         ordenEncontrada.setProductosOrden(orden.getProductosOrden());
+        ordenEncontrada.setProductosOrdenEliminar(orden.getProductosOrdenEliminar());
         ordenesService.EditarProductosOrdenes(ordenEncontrada);
         
         return ResponseEntity.ok().body("Productos Agregados");

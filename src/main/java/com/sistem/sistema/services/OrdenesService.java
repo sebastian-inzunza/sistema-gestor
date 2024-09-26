@@ -72,6 +72,15 @@ public class OrdenesService {
     @SuppressWarnings("static-access")
     @Transactional(readOnly = false)
     public void EditarProductosOrdenes(OrdenesEntity orden){
+
+
+        orden.getProductosOrdenEliminar().forEach(producto ->{
+            if (producto.getOrdenProductoId() != null) {  
+                OrdenesProductosEntity ordenProducto = ordenesProductosRepository.findById(producto.getOrdenProductoId()).get();              
+                ordenesProductosRepository.delete(ordenProducto);
+            }
+        });
+
         orden.setTotal(0D);
         orden.getProductosOrden().forEach(producto->{
             OrdenesProductosEntity ordenProducto = new OrdenesProductosEntity();
@@ -92,7 +101,8 @@ public class OrdenesService {
             ordenesProductosRepository.save(ordenProducto);
             
         });
-
+    
+        
         orden.setEstatus(ordenEstatus.ESPERANDO.toString());
         ordenesRepository.save(orden);
     }

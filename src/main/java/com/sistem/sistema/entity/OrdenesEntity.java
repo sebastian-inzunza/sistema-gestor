@@ -56,4 +56,7 @@ public class OrdenesEntity {
     @Transient
     private List<OrdenProductos> productosOrden;
 
+    @Transient
+    private List<OrdenProductos> productosOrdenEliminar;
+
 }
