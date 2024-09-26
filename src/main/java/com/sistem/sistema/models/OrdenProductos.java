@@ -9,7 +9,8 @@ public class OrdenProductos {
     public OrdenProductos() {
     }
 
-    public OrdenProductos(String producto, Integer cantidad, Double precio) {
+    public OrdenProductos(Long productoId, String producto, Integer cantidad, Double precio) {
+        this.productoId = productoId;
         this.producto = producto;
         this.cantidad = cantidad;
         this.precio = precio;

@@ -43,7 +43,11 @@ public class OrdenesEntity {
 
     @Basic
     @Column(name = "total")
-    private Double total;
+    private double total;
+
+    @Basic
+    @Column(name = "llevar")
+    private Boolean llevar;
 
     @Basic
     @Column(name = "fecha")
@@ -51,7 +55,5 @@ public class OrdenesEntity {
 
     @Transient
     private List<OrdenProductos> productosOrden;
-
-
 
 }
