@@ -33,6 +33,10 @@ public class OrdenesProductosEntity {
     @Basic
     @Column(name = "cantidad")
     private Integer cantidad;
+
+    @Basic
+    @Column(name = "precio")
+    private Double precio;
     
     @Basic
     @Column(name = "atendido")

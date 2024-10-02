@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.sistem.sistema.entity.ProductosEntity;
+import com.sistem.sistema.exception.NotFoundException;
 import com.sistem.sistema.repository.ProductosRepository;
 
 @Service
@@ -43,6 +44,14 @@ public class ProductosSevice {
 
     @Transactional(readOnly = false)
     public ProductosEntity editarProductos(ProductosEntity producto){
+        return productosRepository.save(producto);
+    }
+
+    @Transactional(readOnly = false)
+    public ProductosEntity cambiarEstatus(Long productoId, Boolean estatus){
+        ProductosEntity producto = this.obtenerProductoPorId(productoId).orElseThrow(()-> new NotFoundException("Producto no encontrado"));
+        producto.setEstatus(estatus);
+        
         return productosRepository.save(producto);
     }
 

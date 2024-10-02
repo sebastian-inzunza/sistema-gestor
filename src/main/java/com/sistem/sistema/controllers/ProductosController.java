@@ -1,6 +1,7 @@
 package com.sistem.sistema.controllers;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sistem.sistema.entity.ProductosEntity;
@@ -79,4 +80,10 @@ public class ProductosController {
         return ResponseEntity.ok().body("Se editó el producto");
     }
     
+
+    @PutMapping("estatus/{id}")
+    public ResponseEntity<Object> putMethodName(@PathVariable Long id, @RequestParam(required = true) Boolean estatus) {
+        productosSevice.cambiarEstatus(id, estatus);
+        return ResponseEntity.ok().body(estatus? "Producto Activado" :"Producto Desativado");
+    }
 }

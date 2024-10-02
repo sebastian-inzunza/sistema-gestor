@@ -49,6 +49,10 @@ public class ProductosEntity {
     private String imagen;
 
     @Basic
+    @Column(name = "estatus")
+    private Boolean estatus;
+
+    @Basic
     @Column(name = "fecha")
     private Timestamp fecha;
 

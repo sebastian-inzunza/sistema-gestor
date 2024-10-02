@@ -32,12 +32,9 @@ public class OrdenesController {
     @Autowired
     OrdenesService ordenesService;
     
-    OrdenEstatus ordenEstatus;
-
     @GetMapping("")
     public List<OrdenesEntity> ObtenerOrdenes() {
         return ordenesService.ObtenerOrdenes();
-
     }
 
     @PostMapping("crear")
@@ -46,17 +43,19 @@ public class OrdenesController {
         if(orden.getProductosOrden()== null || orden.getProductosOrden().isEmpty()){
             throw new NotFoundException("Para crear una orden debe tener por lo menos un producto asignado");
         }
+
+        orden.setNombre(ordenesService.GenerarFolio());
         
         if(ordenesService.OrdenIsExist(orden.getNombre())){
             throw new NotFoundException(String.format("ya existe una orden activa con el nombre '%s', ingresa otro nombre", orden.getNombre()));
         }
         
-
+        
 
         OrdenesEntity ordenCreada = ordenesService.CrearOrden(orden); 
         ordenesService.CrearProductosOrdenes(ordenCreada);
 
-        return ResponseEntity.ok().body("Orden creada");
+        return ResponseEntity.ok().body("Orden creada con folio " + orden.getNombre());
     }
     
     @PutMapping("agregar/productos/{ordenId}")
@@ -74,36 +73,33 @@ public class OrdenesController {
         return ResponseEntity.ok().body("Productos Agregados");
     }
 
-    @SuppressWarnings("static-access")
     @PutMapping("/lista")
     public ResponseEntity<Object> OrdenLista( @RequestParam(required = true) Long ordenId) throws Exception {
         OrdenesEntity ordene = ordenesService.ObtenerPorId(ordenId).orElseThrow(()-> new NotFoundException("No se encontro la orden"));
-        ordenesService.CambiarEstatus(ordene.getOrdenId(), ordenEstatus.LISTO.toString());
+        ordenesService.CambiarEstatus(ordene.getOrdenId(), OrdenEstatus.LISTO.toString());
 
         if(ordene.getLlevar()){
-            ordenesService.CambiarEstatus(ordene.getOrdenId(), ordenEstatus.CERRADO.toString());
+            ordenesService.CambiarEstatus(ordene.getOrdenId(), OrdenEstatus.CERRADO.toString());
         }
         
         
         return ResponseEntity.ok().body("Orden Lista");
     }
 
-    @SuppressWarnings("static-access")
     @PutMapping("/cerrar")
     public ResponseEntity<Object> OrdenCerrada( @RequestParam(required = true) Long ordenId) {
         OrdenesEntity ordene = ordenesService.ObtenerPorId(ordenId).orElseThrow(()-> new NotFoundException("No se encontro la orden"));
 
-        ordenesService.CambiarEstatus(ordene.getOrdenId(), ordenEstatus.CERRADO.toString());
+        ordenesService.CambiarEstatus(ordene.getOrdenId(), OrdenEstatus.CERRADO.toString());
 
         return ResponseEntity.ok().body("Orden Cerrada");
     }
 
-    @SuppressWarnings("static-access")
     @PutMapping("/cancelar")
     public ResponseEntity<Object> OrdenCancelada( @RequestParam(required = true) Long ordenId) {
         OrdenesEntity ordene = ordenesService.ObtenerPorId(ordenId).orElseThrow(()-> new NotFoundException("No se encontro la orden"));
 
-        ordenesService.CambiarEstatus(ordene.getOrdenId(), ordenEstatus.CANCELADO.toString());
+        ordenesService.CambiarEstatus(ordene.getOrdenId(), OrdenEstatus.CANCELADO.toString());
 
         return ResponseEntity.ok().body("Orden Cancelada");
     }

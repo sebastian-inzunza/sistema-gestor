@@ -1,6 +1,7 @@
 package com.sistem.sistema.services;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +37,23 @@ public class OrdenesService {
 
     OrdenEstatus ordenEstatus;
 
+    @Transactional(readOnly = true)
+    public String GenerarFolio(){
+        String folio = "";
+        LocalDate localDate = LocalDate.now();
+
+
+        Optional<OrdenesEntity> ultimaOrden = ordenesRepository.ObtenerUltimaOrden(String.valueOf(localDate.getYear()));
+        if(!ultimaOrden.isEmpty()){
+            Integer numero = Integer.valueOf(ultimaOrden.get().getNombre().split("-")[2]);
+            folio = localDate.getYear() + "-Orden-" + ++numero;
+        }else{
+            folio = localDate.getYear() + "-Orden-1";
+        }
+
+        return folio;
+    }
+
     @Transactional(readOnly = false)
     public OrdenesEntity CrearOrden (OrdenesEntity orden){
 
@@ -58,18 +76,19 @@ public class OrdenesService {
 
     @Transactional(readOnly = false)
     public void CrearProductosOrdenes(OrdenesEntity orden){
+
         orden.getProductosOrden().forEach(producto->{
             OrdenesProductosEntity ordenProducto = new OrdenesProductosEntity();
 
             ordenProducto.setOrdenId(orden.getOrdenId());
             ordenProducto.setProductoId(producto.getProductoId());
             ordenProducto.setCantidad(producto.getCantidad());
+            ordenProducto.setPrecio(producto.getPrecio());
 
             ordenesProductosRepository.save(ordenProducto);
         });
     }
     
-    @SuppressWarnings("static-access")
     @Transactional(readOnly = false)
     public void EditarProductosOrdenes(OrdenesEntity orden){
 
@@ -95,15 +114,15 @@ public class OrdenesService {
             ordenProducto.setOrdenId(orden.getOrdenId());
             ordenProducto.setProductoId(producto.getProductoId());
             ordenProducto.setCantidad(producto.getCantidad());
-            
-            System.out.println(ordenProducto.toString());
-            
+            ordenProducto.setPrecio(producto.getPrecio());
+
+                    
             ordenesProductosRepository.save(ordenProducto);
             
         });
     
         
-        orden.setEstatus(ordenEstatus.ESPERANDO.toString());
+        orden.setEstatus(OrdenEstatus.ESPERANDO.toString());
         ordenesRepository.save(orden);
     }
 
@@ -122,13 +141,12 @@ public class OrdenesService {
         return ordenesRepository.ObtenerPorId(id);
     }
 
-    @SuppressWarnings("static-access")
     @Transactional(readOnly = false)
     public void CambiarEstatus(Long ordenId, String estatus){
 
         OrdenesEntity orden = ObtenerPorId(ordenId).orElseThrow(()-> new NotFoundException("No se encontro la orden"));
 
-        if(estatus.equals(ordenEstatus.LISTO.toString())){
+        if(estatus.equals(OrdenEstatus.LISTO.toString())){
             List<OrdenesProductosEntity> productos = ordenesProductosRepository.obtenerInformacion(orden.getOrdenId());
             
             productos.forEach(producto ->{
