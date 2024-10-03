@@ -36,7 +36,12 @@ public class RolesController {
 
     @GetMapping("obtener")
     public List<RolesEntity> ObtenerRoles() {
-        return rolesService.ObtenerRoles();
+        List<RolesEntity> roles = rolesService.ObtenerRoles();
+        roles.forEach( rol ->{
+            rol.setNombre(rol.getNombre().split("_")[1]);
+        });
+        
+        return  roles;
     }
 
     @GetMapping("obtener/admin")
@@ -69,7 +74,6 @@ public class RolesController {
         rolesService.CrearRoles(rol);
         return ResponseEntity.ok().body(String.format("El rol '%s' fue creado con exito", nombre_rol));
     }
-    
 
     @PutMapping("editar/{id}")
     public ResponseEntity<Object> EditarRol(@PathVariable Long id, @RequestBody RolesEntity rol) {

@@ -19,6 +19,9 @@ public class ProductosSevice {
     @Autowired
     ProductosRepository productosRepository;
 
+    @Autowired 
+    CategoriasService categoriasService;
+
     @Transactional(readOnly = true)
     public List<ProductosEntity> obtenerProductos(){
         
@@ -44,6 +47,13 @@ public class ProductosSevice {
 
     @Transactional(readOnly = false)
     public ProductosEntity editarProductos(ProductosEntity producto){
+        producto.setNombre(producto.getNombre());
+        producto.setPrecio(producto.getPrecio());
+        producto.setDescripcion(producto.getDescripcion());
+        
+        categoriasService.eliminarProductoCategoria(producto.getProductoId());
+
+        producto.setCategorias(producto.getCategorias());
         return productosRepository.save(producto);
     }
 

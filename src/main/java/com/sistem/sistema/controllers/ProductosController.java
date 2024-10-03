@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sistem.sistema.entity.ProductosEntity;
 import com.sistem.sistema.exception.NotFoundException;
-import com.sistem.sistema.services.CategoriasService;
 import com.sistem.sistema.services.ProductosSevice;
 
 import java.util.List;
@@ -30,9 +29,6 @@ public class ProductosController {
     
     @Autowired
     ProductosSevice productosSevice;
-
-    @Autowired 
-    CategoriasService categoriasService;
 
     @GetMapping("obtener")
     public List<ProductosEntity> obtenerProductos() {
@@ -68,13 +64,7 @@ public class ProductosController {
             throw new NotFoundException(String.format("El producto '%s' ya se encuentra registrado", producto.getNombre()));
         }
 
-        productosEncontrados.setNombre(producto.getNombre());
-        productosEncontrados.setPrecio(producto.getPrecio());
-        productosEncontrados.setDescripcion(producto.getDescripcion());
-        
-        categoriasService.eliminarProductoCategoria(productosEncontrados.getProductoId());
-
-        productosEncontrados.setCategorias(producto.getCategorias());
+      
         productosSevice.editarProductos(productosEncontrados);
         
         return ResponseEntity.ok().body("Se editó el producto");
