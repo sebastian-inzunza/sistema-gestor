@@ -67,8 +67,7 @@ public class UsuariosController {
         rol.ifPresent(roles::add);
         entity.setRoles(roles);
         
-        
-
+    
         UsuarioEntity usuario = usuarioService.RegistrarUsuario(entity);
         return ResponseEntity.ok().body("Usuario " + usuario.getNombre() + " registrado con exito");
     }
@@ -105,14 +104,7 @@ public class UsuariosController {
         }
 
         UsuarioEntity usuarioEncontrado = usuarioService.ObtenerUsuarioId(id).orElseThrow(() -> new NotFoundException("Usuario no encontado"));
-        
-
-        usuarioEncontrado.setApellidos(usuario.getApellidos());
-        usuarioEncontrado.setNombre(usuario.getNombre());
-
         usuarioService.EditarUsuario(usuarioEncontrado);
-
-
         return ResponseEntity.ok().body("Usuario editado");
     }
 
@@ -127,12 +119,7 @@ public class UsuariosController {
         if(usuario.getRoles() == null || usuario.getRoles().isEmpty()){
             throw new NotFoundException("El usuario debe de tener por lo menos 1 rol asignado");
         }
-
-        rolesService.EliminarRoles(usuarioEncontrado.getUsuarioId());
-        usuarioEncontrado.setRoles(usuario.getRoles());
-
-        usuarioService.EditarUsuario(usuarioEncontrado);
-        
+        usuarioService.EditarRolUsuario(usuarioEncontrado);
         return ResponseEntity.ok().body("Roles de usuarios editados");
     }
 }
