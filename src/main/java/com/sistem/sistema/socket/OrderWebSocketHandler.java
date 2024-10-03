@@ -1,75 +1,62 @@
 package com.sistem.sistema.socket;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.socket.CloseStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sistem.sistema.entity.OrdenesEntity;
+import com.sistem.sistema.services.OrdenEstatus;
 import com.sistem.sistema.services.OrdenesService;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
+@Component
 public class OrderWebSocketHandler extends TextWebSocketHandler {
     
     @Autowired
     OrdenesService ordenesService;
 
+    private List<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
+
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        List<OrdenesEntity> ordenes = ordenesService.ObtenerPorEstatus("ESPERANDO");
-        session.sendMessage(new TextMessage(ordenes.toString()));
+        sessions.add(session);
+        session.sendMessage(new TextMessage(getWaitingOrdersJson()));
     }
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        Long orderId = Long.parseLong(message.getPayload());
-        ordenesService.CambiarEstatus(orderId, "PREPARANDO");
+        session.sendMessage(new TextMessage(message.toString()));
+    }
 
-        List<OrdenesEntity> ordenes = ordenesService.ObtenerPorEstatus("ESPERANDO");
-
-        if (session.isOpen()) {
-            session.sendMessage(new TextMessage(ordenes.toString()));
+    public boolean notificarOrdenCreada() throws Exception{
+        for(WebSocketSession session: sessions){
+            session.sendMessage(new TextMessage(getWaitingOrdersJson()));
         }
-        
+
+        return true;
     }
 
-        @Override
-    public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
-        Long orderId = Long.parseLong((String) message.getPayload());
+    public boolean notificarCambioEstatusOrdenes(String orderId, String estatus) throws Exception{
+        ordenesService.CambiarEstatus(Long.valueOf(orderId), estatus);
 
-       
-        session.sendMessage(new TextMessage("Cambiando orden a  estatus PREPARANDO: "));
-        ordenesService.CambiarEstatus(orderId, "PREPARANDO");
-        session.sendMessage(new TextMessage("Proceso compleatado"));
-
-        List<OrdenesEntity> ordenes = ordenesService.ObtenerPorEstatus("ESPERANDO");
-
-        if (session.isOpen()) {
-            session.sendMessage(new TextMessage(ordenes.toString()));
+        for(WebSocketSession session: sessions){
+            session.sendMessage(new TextMessage(getWaitingOrdersJson()));
         }
-        
+
+        return true;
     }
 
-    @Override
-    public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
-        log.info("Exception occured: {} on session: {}", exception.getMessage(), session.getId());
-    }
 
-    @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
-        log.info("Connection closed on session: {} with status: {}", session.getId(), closeStatus.getCode());
+    private String getWaitingOrdersJson() throws JsonProcessingException {
+        // Convertir las órdenes con estatus "ESPERANDO" a JSON
+        List<OrdenesEntity> waitingOrders = ordenesService.ObtenerPorEstatus(OrdenEstatus.ESPERANDO.toString());
+        return new ObjectMapper().writeValueAsString(waitingOrders);
     }
-
-    @Override
-    public boolean supportsPartialMessages() {
-        return false;
-    }
-
     
 }

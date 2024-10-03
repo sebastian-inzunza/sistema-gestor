@@ -13,7 +13,7 @@ import com.sistem.sistema.entity.OrdenesEntity;
 import com.sistem.sistema.exception.NotFoundException;
 import com.sistem.sistema.services.OrdenEstatus;
 import com.sistem.sistema.services.OrdenesService;
-
+import com.sistem.sistema.socket.OrderWebSocketHandler;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,6 +31,10 @@ public class OrdenesController {
     
     @Autowired
     OrdenesService ordenesService;
+
+    @Autowired
+    OrderWebSocketHandler orderWebSocketHandler;
+
     
     @GetMapping("")
     public List<OrdenesEntity> ObtenerOrdenes() {
@@ -38,7 +42,7 @@ public class OrdenesController {
     }
 
     @PostMapping("crear")
-    public ResponseEntity<Object> CrearOrden(@RequestBody OrdenesEntity orden) {
+    public ResponseEntity<Object> CrearOrden(@RequestBody OrdenesEntity orden) throws Exception {
 
         if(orden.getProductosOrden()== null || orden.getProductosOrden().isEmpty()){
             throw new NotFoundException("Para crear una orden debe tener por lo menos un producto asignado");
@@ -54,7 +58,8 @@ public class OrdenesController {
 
         OrdenesEntity ordenCreada = ordenesService.CrearOrden(orden); 
         ordenesService.CrearProductosOrdenes(ordenCreada);
-
+        orderWebSocketHandler.notificarOrdenCreada();
+        
         return ResponseEntity.ok().body("Orden creada con folio " + orden.getNombre());
     }
     
@@ -73,6 +78,16 @@ public class OrdenesController {
         return ResponseEntity.ok().body("Productos Agregados");
     }
 
+    @PutMapping("/preprando")
+    public ResponseEntity<Object> OrdenPreparando( @RequestParam(required = true) Long ordenId) throws Exception {
+        OrdenesEntity ordene = ordenesService.ObtenerPorId(ordenId).orElseThrow(()-> new NotFoundException("No se encontro la orden"));
+
+        //Avisamos a todos los los que esten conectados al socket que una orden fue tomada
+        orderWebSocketHandler.notificarCambioEstatusOrdenes(String.valueOf(ordene.getOrdenId()), OrdenEstatus.PREPARANDO.toString());    
+        
+        return ResponseEntity.ok().body("Orden Prerandonse");
+    }
+
     @PutMapping("/lista")
     public ResponseEntity<Object> OrdenLista( @RequestParam(required = true) Long ordenId) throws Exception {
         OrdenesEntity ordene = ordenesService.ObtenerPorId(ordenId).orElseThrow(()-> new NotFoundException("No se encontro la orden"));
@@ -81,8 +96,7 @@ public class OrdenesController {
         if(ordene.getLlevar()){
             ordenesService.CambiarEstatus(ordene.getOrdenId(), OrdenEstatus.CERRADO.toString());
         }
-        
-        
+
         return ResponseEntity.ok().body("Orden Lista");
     }
 

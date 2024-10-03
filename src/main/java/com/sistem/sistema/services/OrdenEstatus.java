@@ -8,7 +8,6 @@ public enum OrdenEstatus {
     CERRADO ("Cerrado"),
     CANCELADO ("Cancelado");
 
-OrdenEstatus(String string) {
-    //TODO Auto-generated constructor stub
-}
+    OrdenEstatus(String string) {
+    }
 }
