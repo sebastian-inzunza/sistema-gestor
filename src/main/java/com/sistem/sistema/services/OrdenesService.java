@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.sistem.sistema.entity.OrdenesEntity;
 import com.sistem.sistema.entity.OrdenesProductosEntity;
@@ -36,6 +37,7 @@ public class OrdenesService {
 
     OrdenEstatus ordenEstatus;
 
+    @Transactional(readOnly = true)
     public String GenerarFolio(){
         String folio = "";
         LocalDate localDate = LocalDate.now();
@@ -54,6 +56,7 @@ public class OrdenesService {
         return folio;
     }
 
+    @Transactional(readOnly = false)
     public OrdenesEntity CrearOrden (OrdenesEntity orden){
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -73,6 +76,7 @@ public class OrdenesService {
         return ordenesRepository.save(orden);
     }
 
+    @Transactional(readOnly = false)
     public void CrearProductosOrdenes(OrdenesEntity orden){
 
         orden.getProductosOrden().forEach(producto->{
@@ -87,6 +91,7 @@ public class OrdenesService {
         });
     }
     
+    @Transactional(readOnly = false)
     public void EditarProductosOrdenes(OrdenesEntity orden){
 
 
@@ -123,18 +128,22 @@ public class OrdenesService {
         ordenesRepository.save(orden);
     }
 
+    @Transactional(readOnly = true)
     public boolean OrdenIsExist(String nombre){
         return ordenesRepository.ObtenerOrdenPorNombreEstatus(nombre, OrdenEstatus.CERRADO.toString()).isPresent();
     }
 
+    @Transactional(readOnly = true)
     public List<OrdenesEntity> ObtenerPorEstatus(String estatus){
         return ordenesRepository.ObtenerOrdenEstatus(estatus);
     }
 
+    @Transactional(readOnly = true)
     public Optional<OrdenesEntity> ObtenerPorId(Long id){
         return ordenesRepository.ObtenerPorId(id);
     }
 
+    @Transactional(readOnly = false)
     public void CambiarEstatus(Long ordenId, String estatus){
 
         OrdenesEntity orden = ObtenerPorId(ordenId).orElseThrow(()-> new NotFoundException("No se encontro la orden"));
@@ -153,6 +162,7 @@ public class OrdenesService {
 
     }
 
+    @Transactional(readOnly = true)
     public List<OrdenesEntity> ObtenerOrdenes(){
         List<OrdenesEntity> ordenes = ordenesRepository.findAll();
         
