@@ -3,6 +3,6 @@ COPY . .
 RUN mvn clean package -DskipTests
 
 FROM openjdk:17.0.1-jdk-slim
-COPY --from=build /target/sistema-0.0.1-SNAPSHOT.war sistema-gestor.war
+COPY --from=build /target/sistema-0.0.1-SNAPSHOT.jar sistema-gestor.war
 EXPOSE 8080
-ENTRYPOINT [ "java", "-war","sistema-gestor.war" ]
+ENTRYPOINT [ "java", "-jar","sistema-gestor.jar" ]
