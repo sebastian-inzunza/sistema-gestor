@@ -41,7 +41,7 @@ public class ProductosSevice {
     @Transactional(readOnly = false)
     public ProductosEntity crearProductos(ProductosEntity producto){
         producto.setFecha(new Timestamp(new Date().getTime()));
-
+        producto.setEstatus(true);
         return productosRepository.save(producto);
     }
 
