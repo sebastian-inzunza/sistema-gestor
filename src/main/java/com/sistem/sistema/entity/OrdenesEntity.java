@@ -26,7 +26,7 @@ public class OrdenesEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ordenId")
+    @Column(name = "orden_id")
     private Long ordenId;
 
     @Basic

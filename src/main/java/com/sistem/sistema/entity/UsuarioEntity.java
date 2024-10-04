@@ -29,11 +29,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "usuarios")
+@Table(name = "usuarios", schema = "public")
 public class UsuarioEntity {
 
     @Id
-    @Column(name = "usuarioId")
+    @Column(name = "usuario_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long usuarioId;
 
@@ -66,10 +66,10 @@ public class UsuarioEntity {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "usuarios_roles",
-        joinColumns = @JoinColumn(name = "usuarioId"),
-        inverseJoinColumns = @JoinColumn( name = "rolId"),
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"usuarioId", "rolId"})}
-    )
+        joinColumns = @JoinColumn(name = "usuario_id"),
+        inverseJoinColumns = @JoinColumn( name = "rol_id"),
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"usuario_id", "rol_id"})}
+        )
     private List<RolesEntity> roles;
 
     @Transient
