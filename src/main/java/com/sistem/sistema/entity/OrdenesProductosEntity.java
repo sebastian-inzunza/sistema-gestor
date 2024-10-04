@@ -19,15 +19,15 @@ import lombok.NoArgsConstructor;
 public class OrdenesProductosEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "Id")
+    @Column(name = "id")
     private Long Id;
 
     @Basic
-    @Column(name = "ordenId")
+    @Column(name = "orden_id")
     private Long ordenId;
 
     @Basic
-    @Column(name = "productoId")
+    @Column(name = "producto_id")
     private Long productoId;
 
     @Basic

@@ -24,7 +24,12 @@ public class RolesService {
 
     @Transactional(readOnly = true)
     public List<RolesEntity> ObtenerRoles(){
-        return rolesRepository.obtenerRoles();
+        List<RolesEntity> roles =  rolesRepository.obtenerRoles();
+        roles.forEach( rol ->{
+            rol.setNombre(rol.getNombre().split("_")[1]);
+        });
+
+        return roles;
     }
 
     @Transactional(readOnly = true)

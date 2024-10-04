@@ -36,12 +36,7 @@ public class RolesController {
 
     @GetMapping("obtener")
     public List<RolesEntity> ObtenerRoles() {
-        List<RolesEntity> roles = rolesService.ObtenerRoles();
-        roles.forEach( rol ->{
-            rol.setNombre(rol.getNombre().split("_")[1]);
-        });
-        
-        return  roles;
+        return rolesService.ObtenerRoles();      
     }
 
     @GetMapping("obtener/admin")
@@ -53,6 +48,7 @@ public class RolesController {
     @GetMapping("obtener/{id}")
     public RolesEntity ObtenerRol(@PathVariable Long id) {
         RolesEntity rolEncontrado = rolesService.ObtenerRolPorId(id).orElseThrow(() -> new NotFoundException("El rol a editar no existe o fue eliminado"));
+        rolEncontrado.setNombre(rolEncontrado.getNombre().split("_")[1]);
         return rolEncontrado;
     }
     

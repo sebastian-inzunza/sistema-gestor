@@ -27,7 +27,7 @@ public class EnpointsEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "endpointId")
+    @Column(name = "endpoint_id")
     private Long endpointId;
 
     @Basic

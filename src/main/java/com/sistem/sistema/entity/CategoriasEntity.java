@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@Table(name="categorias")
+@Table(name="categorias", schema = "public")
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoriasEntity {

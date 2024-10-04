@@ -30,7 +30,7 @@ public class RolesEntity {
     
     @Id
     @GeneratedValue(strategy =  GenerationType.IDENTITY)
-    @Column(name = "rolId")
+    @Column(name = "rol_id")
     private Long rolId;
 
     @Basic
@@ -47,9 +47,9 @@ public class RolesEntity {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "enpoints_roles",
-        joinColumns = @JoinColumn(name = "rolId"),
-        inverseJoinColumns = @JoinColumn( name = "endpointId"),
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"endpointId", "rolId"})}
+        joinColumns = @JoinColumn(name = "rol_id"),
+        inverseJoinColumns = @JoinColumn( name = "endpoint_id"),
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"endpoint_id", "rol_id"})}
     )
     private List<EnpointsEntity> endpoints;
 

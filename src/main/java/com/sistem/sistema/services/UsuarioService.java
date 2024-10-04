@@ -20,6 +20,9 @@ public class UsuarioService {
     
     @Autowired
     PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    RolesService rolesService;
 
     @Transactional(readOnly = true)
     public List<UsuarioEntity> ObtenerUsuarios (){
@@ -56,6 +59,19 @@ public class UsuarioService {
 
     @Transactional(readOnly = false)
     public UsuarioEntity  EditarUsuario(UsuarioEntity usuario){
+        
+        usuario.setApellidos(usuario.getApellidos());
+        usuario.setNombre(usuario.getNombre());
+        
+        return usuarioRepository.save(usuario);
+    } 
+
+    @Transactional(readOnly = false)
+    public UsuarioEntity  EditarRolUsuario(UsuarioEntity usuario){
+        
+        rolesService.EliminarRoles(usuario.getUsuarioId());
+        usuario.setRoles(usuario.getRoles());
+
         return usuarioRepository.save(usuario);
     } 
 }
