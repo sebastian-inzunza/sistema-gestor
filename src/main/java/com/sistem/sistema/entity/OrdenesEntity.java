@@ -34,7 +34,7 @@ public class OrdenesEntity {
     private String nombre;
 
     @Basic
-    @Column(name = "usuarioId")
+    @Column(name = "usuario_id")
     private Long usuarioId;
 
     @Basic

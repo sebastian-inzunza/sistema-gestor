@@ -29,7 +29,7 @@ public class ProductosEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "productoId")
+    @Column(name = "producto_id")
     private Long productoId;
 
     @Basic
@@ -60,9 +60,9 @@ public class ProductosEntity {
     @OneToOne()
     @JoinTable(
         name = "productos_categorias",
-        joinColumns = @JoinColumn(name = "productoId"),
-        inverseJoinColumns = @JoinColumn(name = "categoriaId"),
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"productoId", "categoriaId"})}
+        joinColumns = @JoinColumn(name = "producto_id"),
+        inverseJoinColumns = @JoinColumn(name = "categoria_id"),
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"producto_id", "categoria_id"})}
     )
     private CategoriasEntity categorias;
 
