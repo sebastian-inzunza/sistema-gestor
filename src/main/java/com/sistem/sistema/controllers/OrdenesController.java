@@ -49,7 +49,7 @@ public class OrdenesController {
         }
 
         orden.setNombre(ordenesService.GenerarFolio());
-        
+
         if(ordenesService.OrdenIsExist(orden.getNombre())){
             throw new NotFoundException(String.format("ya existe una orden activa con el nombre '%s', ingresa otro nombre", orden.getNombre()));
         }
@@ -78,7 +78,7 @@ public class OrdenesController {
         return ResponseEntity.ok().body("Productos Agregados");
     }
 
-    @PutMapping("/preprando")
+    @PutMapping("/preparando")
     public ResponseEntity<Object> OrdenPreparando( @RequestParam(required = true) Long ordenId) throws Exception {
         OrdenesEntity ordene = ordenesService.ObtenerPorId(ordenId).orElseThrow(()-> new NotFoundException("No se encontro la orden"));
 

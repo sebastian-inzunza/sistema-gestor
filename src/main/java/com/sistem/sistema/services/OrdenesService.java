@@ -2,7 +2,6 @@ package com.sistem.sistema.services;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
@@ -41,24 +40,25 @@ public class OrdenesService {
 
     @Transactional(readOnly = true)
     public String GenerarFolio() throws ParseException{
+
         String folio = "";
         LocalDate localDate = LocalDate.now();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
-        Date fechaInicio = dateFormat.parse(localDate.getYear() + "-01-01 00:00:00");
-        Date fechaFin = dateFormat.parse(localDate.getYear() + "-12-31 23:59:59");
+        String date = localDate.getYear() + "-01-01 00:00:00";
+        Timestamp timestampInicio = Timestamp.valueOf(date);
 
-        Timestamp timestampInicio = new Timestamp(fechaInicio.getTime());
-        Timestamp timestampFin = new Timestamp(fechaFin.getTime());
+        date = localDate.getYear() + "-12-31 23:59:59";
+        Timestamp timestampFin = Timestamp.valueOf(date);
 
         Optional<OrdenesEntity> ultimaOrden = ordenesRepository.ObtenerUltimaOrden(timestampInicio, timestampFin);
+
         if(!ultimaOrden.isEmpty()){
             Integer numero = Integer.valueOf(ultimaOrden.get().getNombre().split("-")[2]);
             folio = localDate.getYear() + "-Orden-" + ++numero;
         }else{
             folio = localDate.getYear() + "-Orden-1";
         }
- 
+
         return folio;
     }
 
@@ -102,7 +102,7 @@ public class OrdenesService {
 
 
         orden.getProductosOrdenEliminar().forEach(producto ->{
-            if (producto.getOrdenProductoId() != null) {  
+            if (!producto.getAtendido()) {  
                 OrdenesProductosEntity ordenProducto = ordenesProductosRepository.findById(producto.getOrdenProductoId()).get();              
                 ordenesProductosRepository.delete(ordenProducto);
             }

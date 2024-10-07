@@ -22,6 +22,6 @@ public interface OrdenesRepository extends JpaRepository<OrdenesEntity, Long> {
     @Query("SELECT ord FROM OrdenesEntity ord WHERE  ord.ordenId=:id")
     Optional<OrdenesEntity> ObtenerPorId(@Param("id") Long id);
 
-    @Query(value = "SELECT * FROM ordenes WHERE orden_id = (SELECT MAX(orden_id) FROM ordenes) AND fecha BETWEEN TO_TIMESTAMP(:fechaInicio) AND TO_TIMESTAMP(:fechaFin)", nativeQuery = true)
+    @Query(value = "SELECT * FROM public.ordenes WHERE orden_id = (SELECT MAX(orden_id) FROM public.ordenes) AND fecha BETWEEN :fechaInicio AND :fechaFin", nativeQuery = true)
     Optional<OrdenesEntity> ObtenerUltimaOrden(@Param("fechaInicio") Timestamp fechaInicio, @Param("fechaFin") Timestamp fechaFin);
 }
