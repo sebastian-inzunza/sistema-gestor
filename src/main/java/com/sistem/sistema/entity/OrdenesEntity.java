@@ -3,7 +3,6 @@ package com.sistem.sistema.entity;
 import java.sql.Timestamp;
 import java.util.List;
 
-import com.sistem.sistema.models.OrdenProductos;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
@@ -43,7 +42,7 @@ public class OrdenesEntity {
 
     @Basic
     @Column(name = "total")
-    private double total;
+    private Double total;
 
     @Basic
     @Column(name = "llevar")
@@ -54,9 +53,9 @@ public class OrdenesEntity {
     private Timestamp fecha;
 
     @Transient
-    private List<OrdenProductos> productosOrden;
+    private List<OrdenesProductosEntity> productosOrden;
 
     @Transient
-    private List<OrdenProductos> productosOrdenEliminar;
+    private List<OrdenesProductosEntity> productosOrdenEliminar;
 
 }

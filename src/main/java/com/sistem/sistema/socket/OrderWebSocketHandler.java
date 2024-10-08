@@ -23,14 +23,14 @@ public class OrderWebSocketHandler extends TextWebSocketHandler {
 
     private List<WebSocketSession> sessions = new CopyOnWriteArrayList<>();
 
-    @SuppressWarnings("null")
+    @SuppressWarnings("")
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         sessions.add(session);
         session.sendMessage(new TextMessage(getWaitingOrdersJson()));
     }
 
-    @SuppressWarnings("null")
+    @SuppressWarnings("")
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         session.sendMessage(new TextMessage(message.toString()));
