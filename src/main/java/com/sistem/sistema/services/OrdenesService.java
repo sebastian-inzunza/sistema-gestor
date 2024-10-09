@@ -86,21 +86,28 @@ public class OrdenesService {
     @Transactional(readOnly = false)
     public void CrearProductosOrdenes(OrdenesEntity orden){
 
+        List<OrdenesProductosEntity> isPreparados = ordenesProductosRepository.obtenerInformacionPreparado(orden.getOrdenId());
+
+        //Todos los productos que se agregaron no es necesario mandar a preparacion 
+        if(isPreparados.isEmpty()){
+            this.CambiarEstatus(orden.getOrdenId(), OrdenEstatus.LISTO.toString());
+        }
+
         orden.getProductosOrden().forEach(ordenProducto->{
             ProductosEntity producto = productosSevice.obtenerProductoPorId(ordenProducto.getProductoId()).orElseThrow(() -> new NotFoundException("Producto no encontrado"));
 
-            orden.setTotal( orden.getTotal() + ordenProducto.getCantidad() * producto.getPrecio());
+            
 
             ordenProducto.setOrdenId(orden.getOrdenId());
             ordenProducto.setProductoId(producto.getProductoId());
             ordenProducto.setPrecio(producto.getPrecio());
             ordenProducto.setProducto(producto.getNombre());
             ordenProducto.setAtendido(false);
+            ordenProducto.setPreparado(producto.getPreparado());
 
             ordenesProductosRepository.save(ordenProducto);
         });
 
-        ordenesRepository.save(orden);
     }
     
     
@@ -108,6 +115,7 @@ public class OrdenesService {
     public void EditarProductosOrdenes(OrdenesEntity orden){
 
 
+        //Elmina a los productos
         orden.getProductosOrdenEliminar().forEach(producto ->{
             if (!producto.isAtendido()) {  
                 OrdenesProductosEntity ordenProducto = ordenesProductosRepository.findById(producto.getId()).get();              
@@ -119,27 +127,30 @@ public class OrdenesService {
         orden.getProductosOrden().forEach(ordenProducto->{
             ProductosEntity producto = productosSevice.obtenerProductoPorId(ordenProducto.getProductoId()).orElseThrow(() -> new NotFoundException("Producto no encontrado"));
 
-            orden.setTotal( orden.getTotal() + ordenProducto.getCantidad() * producto.getPrecio());
-
-
             if(ordenProducto.getId() != null){
                 ordenProducto.setAtendido(false);
             }
 
+
+            if(producto.getCategorias().getNombre().equals("orden"))
             ordenProducto.setPrecio(producto.getPrecio());
             ordenProducto.setOrdenId(orden.getOrdenId());
             ordenProducto.setProductoId(producto.getProductoId());
             ordenProducto.setProducto(producto.getNombre());
-
-            System.out.println(ordenProducto.toString());
                     
             ordenesProductosRepository.save(ordenProducto);
             
         });
     
-        
-        orden.setEstatus(OrdenEstatus.ESPERANDO.toString());
-        ordenesRepository.save(orden);
+        List<OrdenesProductosEntity> isPreparados = ordenesProductosRepository.obtenerInformacionPreparado(orden.getOrdenId());
+        //Todos los productos que se agregaron no es necesario mandar a preparacion 
+        if(isPreparados.isEmpty()){
+            this.CambiarEstatus(orden.getOrdenId(), OrdenEstatus.LISTO.toString());
+        }else{
+            orden.setEstatus(OrdenEstatus.ESPERANDO.toString());
+            ordenesRepository.save(orden);
+        }
+
     }
     
     @Transactional(readOnly = true)
@@ -166,9 +177,12 @@ public class OrdenesService {
             List<OrdenesProductosEntity> productos = ordenesProductosRepository.obtenerInformacion(orden.getOrdenId());
             
             productos.forEach(producto ->{
+                orden.setTotal(orden.getTotal() + (producto.getPrecio() *  producto.getCantidad()));
+
                 producto.setAtendido(true);
                 ordenesProductosRepository.save(producto);
             });
+            
         }
         
         orden.setEstatus(estatus);

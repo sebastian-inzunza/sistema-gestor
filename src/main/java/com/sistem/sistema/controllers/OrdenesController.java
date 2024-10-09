@@ -95,6 +95,8 @@ public class OrdenesController {
 
         ordenEncontrada.setProductosOrden(orden.getProductosOrden());
         ordenEncontrada.setProductosOrdenEliminar(orden.getProductosOrdenEliminar());
+
+        
         ordenesService.EditarProductosOrdenes(ordenEncontrada);
         
         return ResponseEntity.ok().body("Productos Agregados");
@@ -113,6 +115,11 @@ public class OrdenesController {
     @PutMapping("/lista")
     public ResponseEntity<Object> OrdenLista( @RequestParam(required = true) Long ordenId) throws Exception {
         OrdenesEntity ordene = ordenesService.ObtenerPorId(ordenId).orElseThrow(()-> new NotFoundException("No se encontro la orden"));
+
+        if(!ordene.getEstatus().equals(OrdenEstatus.PREPARANDO.toString())){
+            throw new NotFoundException(String.format("La orden esta en estatus '%s', no se puede cambiar orden a lista", ordene.getEstatus()));
+        }
+
         ordenesService.CambiarEstatus(ordene.getOrdenId(), OrdenEstatus.LISTO.toString());
 
         if(ordene.getLlevar()){

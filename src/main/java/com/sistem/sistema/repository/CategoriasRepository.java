@@ -13,8 +13,8 @@ public interface CategoriasRepository extends JpaRepository<CategoriasEntity, Lo
 
     @Modifying
     @Transactional  
-    @Query(value = "DELETE FROM productos_categorias WHERE productoId=:productoId", nativeQuery = true)
-    void eliminarProductoCategoria(@Param("productoId") Long productoId);
+    @Query(value = "DELETE FROM productos_categorias WHERE producto_id=:producto_id", nativeQuery = true)
+    void eliminarProductoCategoria(@Param("producto_id") Long producto_id);
 
     boolean existsByNombre(String nombre);
 

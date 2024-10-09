@@ -56,6 +56,10 @@ public class ProductosEntity {
     @Column(name = "fecha")
     private Timestamp fecha;
 
+    @Basic
+    @Column(name = "preparado")
+    private Boolean preparado;
+
     @JsonIgnoreProperties({"productos", "handler", "hibernateLazyInitializer"})
     @OneToOne()
     @JoinTable(

@@ -46,15 +46,19 @@ public class ProductosSevice {
     }
 
     @Transactional(readOnly = false)
-    public ProductosEntity editarProductos(ProductosEntity producto){
-        producto.setNombre(producto.getNombre());
-        producto.setPrecio(producto.getPrecio());
-        producto.setDescripcion(producto.getDescripcion());
-        
-        categoriasService.eliminarProductoCategoria(producto.getProductoId());
+    public ProductosEntity editarProductos(ProductosEntity producto, ProductosEntity productoEncontrado){
+        productoEncontrado.setNombre(producto.getNombre());
+        productoEncontrado.setPrecio(producto.getPrecio());
+        productoEncontrado.setDescripcion(producto.getDescripcion());
+        productoEncontrado.setPreparado(producto.getPreparado());
 
-        producto.setCategorias(producto.getCategorias());
-        return productosRepository.save(producto);
+        
+        categoriasService.eliminarProductoCategoria(productoEncontrado.getProductoId());
+        productoEncontrado.setCategorias(producto.getCategorias());
+        
+        System.out.println(productoEncontrado.getCategorias());
+
+        return productosRepository.save(productoEncontrado);
     }
 
     @Transactional(readOnly = false)

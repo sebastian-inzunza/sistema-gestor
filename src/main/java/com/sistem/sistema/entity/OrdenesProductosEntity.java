@@ -45,4 +45,8 @@ public class OrdenesProductosEntity {
     @Basic
     @Column(name = "producto")
     private String producto;
+
+    @Basic
+    @Column(name = "preparado")    
+    private Boolean preparado;
 }

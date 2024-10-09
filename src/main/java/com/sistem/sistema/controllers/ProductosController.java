@@ -65,7 +65,7 @@ public class ProductosController {
         }
 
       
-        productosSevice.editarProductos(productosEncontrados);
+        productosSevice.editarProductos(producto, productosEncontrados);
         
         return ResponseEntity.ok().body("Se editó el producto");
     }
