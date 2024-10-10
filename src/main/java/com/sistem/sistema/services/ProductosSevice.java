@@ -53,10 +53,11 @@ public class ProductosSevice {
         productoEncontrado.setPreparado(producto.getPreparado());
 
         
-        categoriasService.eliminarProductoCategoria(productoEncontrado.getProductoId());
-        productoEncontrado.setCategorias(producto.getCategorias());
+        if(!productoEncontrado.getCategorias().getCategoriaId().equals(producto.getCategorias().getCategoriaId())){
+            categoriasService.eliminarProductoCategoria(productoEncontrado.getProductoId());
+            productoEncontrado.setCategorias(producto.getCategorias());
+        }
         
-        System.out.println(productoEncontrado.getCategorias());
 
         return productosRepository.save(productoEncontrado);
     }

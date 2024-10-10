@@ -80,7 +80,7 @@ public class OrdenesController {
 
         OrdenesEntity ordenCreada = ordenesService.CrearOrden(orden); 
         ordenesService.CrearProductosOrdenes(ordenCreada);
-        orderWebSocketHandler.notificarOrdenCreada();
+        
         
         return ResponseEntity.ok().body("Orden creada con folio " + orden.getNombre());
     }
@@ -96,7 +96,7 @@ public class OrdenesController {
         ordenEncontrada.setProductosOrden(orden.getProductosOrden());
         ordenEncontrada.setProductosOrdenEliminar(orden.getProductosOrdenEliminar());
 
-        
+
         ordenesService.EditarProductosOrdenes(ordenEncontrada);
         
         return ResponseEntity.ok().body("Productos Agregados");

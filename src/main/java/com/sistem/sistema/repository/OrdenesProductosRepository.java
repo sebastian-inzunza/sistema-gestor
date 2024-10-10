@@ -12,8 +12,11 @@ public interface OrdenesProductosRepository extends  JpaRepository<OrdenesProduc
     @Query("SELECT ord FROM OrdenesProductosEntity ord LEFT JOIN ProductosEntity pro ON ord.productoId=pro.productoId WHERE ord.ordenId=:ordenId")
     List<OrdenesProductosEntity> obtenerProductos(@Param("ordenId") Long ordenId);
 
-    @Query("SELECT ord FROM OrdenesProductosEntity ord WHERE ord.ordenId=:ordenId AND ord.atendido=false")
+    @Query("SELECT ord FROM OrdenesProductosEntity ord WHERE ord.ordenId=:ordenId ")
     List<OrdenesProductosEntity> obtenerInformacion(@Param("ordenId") Long ordenId);
+
+    @Query("SELECT ord FROM OrdenesProductosEntity ord WHERE ord.ordenId=:ordenId AND ord.atendido=false")
+    List<OrdenesProductosEntity> obtenerInformacioNoPreparados(@Param("ordenId") Long ordenId);
 
     @Query("SELECT ord FROM OrdenesProductosEntity ord WHERE ord.ordenId=:ordenId AND ord.atendido=false AND ord.preparado=false")
     List<OrdenesProductosEntity> obtenerInformacionPreparado(@Param("ordenId") Long ordenId);

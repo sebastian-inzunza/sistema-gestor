@@ -24,7 +24,7 @@ import com.sistem.sistema.entity.ProductosEntity;
 import com.sistem.sistema.entity.UsuarioEntity;
 import com.sistem.sistema.repository.OrdenesProductosRepository;
 import com.sistem.sistema.repository.OrdenesRepository;
-
+import com.sistem.sistema.socket.OrderWebSocketHandler;
 import com.sistem.sistema.exception.NotFoundException;
 
 
@@ -42,6 +42,10 @@ public class OrdenesService {
 
     @Autowired 
     ProductosSevice productosSevice;
+
+    
+    @Autowired
+    OrderWebSocketHandler orderWebSocketHandler;
 
     OrdenEstatus ordenEstatus;
 
@@ -84,14 +88,7 @@ public class OrdenesService {
     }
 
     @Transactional(readOnly = false)
-    public void CrearProductosOrdenes(OrdenesEntity orden){
-
-        List<OrdenesProductosEntity> isPreparados = ordenesProductosRepository.obtenerInformacionPreparado(orden.getOrdenId());
-
-        //Todos los productos que se agregaron no es necesario mandar a preparacion 
-        if(isPreparados.isEmpty()){
-            this.CambiarEstatus(orden.getOrdenId(), OrdenEstatus.LISTO.toString());
-        }
+    public void CrearProductosOrdenes(OrdenesEntity orden) throws Exception{
 
         orden.getProductosOrden().forEach(ordenProducto->{
             ProductosEntity producto = productosSevice.obtenerProductoPorId(ordenProducto.getProductoId()).orElseThrow(() -> new NotFoundException("Producto no encontrado"));
@@ -107,6 +104,20 @@ public class OrdenesService {
 
             ordenesProductosRepository.save(ordenProducto);
         });
+
+        List<OrdenesProductosEntity> isPreparados = ordenesProductosRepository.obtenerInformacionPreparado(orden.getOrdenId());
+
+        if(isPreparados.isEmpty()){
+            //Si la orden tiene todos sus productos como previamente preparado (Agua, refrescos, postres) se manda direcatmante a orden lista 
+            this.CambiarEstatus(orden, OrdenEstatus.LISTO.toString());//Cambia a Listo y calcula total
+
+            if(orden.getLlevar()){ //Si la orden es para llevar automaticamente se cierra despues de estar lista
+                this.CambiarEstatus(orden, OrdenEstatus.CERRADO.toString());
+            }
+
+        }else{
+            orderWebSocketHandler.notificarOrdenCreada();  //Si hay productos que son necesarios preararse en cocina, notifica una nueva orden en espera
+        }
 
     }
     
@@ -132,12 +143,12 @@ public class OrdenesService {
             }
 
 
-            if(producto.getCategorias().getNombre().equals("orden"))
             ordenProducto.setPrecio(producto.getPrecio());
             ordenProducto.setOrdenId(orden.getOrdenId());
             ordenProducto.setProductoId(producto.getProductoId());
             ordenProducto.setProducto(producto.getNombre());
-                    
+            ordenProducto.setPreparado(producto.getPreparado());
+            
             ordenesProductosRepository.save(ordenProducto);
             
         });
@@ -172,6 +183,26 @@ public class OrdenesService {
     public void CambiarEstatus(Long ordenId, String estatus){
 
         OrdenesEntity orden = ObtenerPorId(ordenId).orElseThrow(()-> new NotFoundException("No se encontro la orden"));
+
+        if(estatus.equals(OrdenEstatus.LISTO.toString())){
+            List<OrdenesProductosEntity> productos = ordenesProductosRepository.obtenerInformacion(orden.getOrdenId());
+            
+            productos.forEach(producto ->{
+                orden.setTotal(orden.getTotal() + (producto.getPrecio() *  producto.getCantidad()));
+
+                producto.setAtendido(true);
+                ordenesProductosRepository.save(producto);
+            });
+            
+        }
+        
+        orden.setEstatus(estatus);
+        ordenesRepository.save(orden);
+    }
+
+    
+    @Transactional(readOnly = false)
+    public void CambiarEstatus( OrdenesEntity orden, String estatus){
 
         if(estatus.equals(OrdenEstatus.LISTO.toString())){
             List<OrdenesProductosEntity> productos = ordenesProductosRepository.obtenerInformacion(orden.getOrdenId());
