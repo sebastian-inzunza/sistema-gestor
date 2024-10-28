@@ -44,7 +44,6 @@ public class OrdenesService {
     ProductosSevice productosSevice;
 
     
-    @Autowired
     OrderWebSocketHandler orderWebSocketHandler;
 
     OrdenEstatus ordenEstatus;
@@ -123,7 +122,7 @@ public class OrdenesService {
     
     
     @Transactional(readOnly = false)
-    public void EditarProductosOrdenes(OrdenesEntity orden){
+    public void EditarProductosOrdenes(OrdenesEntity orden) throws Exception{
 
 
         //Elmina a los productos
@@ -160,6 +159,8 @@ public class OrdenesService {
         }else{
             orden.setEstatus(OrdenEstatus.ESPERANDO.toString());
             ordenesRepository.save(orden);
+            orderWebSocketHandler.notificarOrdenCreada();  //Si hay productos que son necesarios preararse en cocina, notifica una nueva orden en espera
+
         }
 
     }

@@ -70,7 +70,6 @@ public class ProductosController {
         return ResponseEntity.ok().body("Se editó el producto");
     }
     
-
     @PutMapping("estatus/{id}")
     public ResponseEntity<Object> putMethodName(@PathVariable Long id, @RequestParam(required = true) Boolean estatus) {
         productosSevice.cambiarEstatus(id, estatus);

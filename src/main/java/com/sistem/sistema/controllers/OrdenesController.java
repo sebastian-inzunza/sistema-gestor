@@ -38,8 +38,6 @@ public class OrdenesController {
     @Autowired
     OrderWebSocketHandler orderWebSocketHandler;
 
-
-
     @GetMapping("")
     public List<OrdenesEntity> ObtenerOrdenes() {
         return ordenesService.ObtenerOrdenes();
@@ -97,7 +95,11 @@ public class OrdenesController {
         ordenEncontrada.setProductosOrdenEliminar(orden.getProductosOrdenEliminar());
 
 
-        ordenesService.EditarProductosOrdenes(ordenEncontrada);
+        try {
+            ordenesService.EditarProductosOrdenes(ordenEncontrada);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         
         return ResponseEntity.ok().body("Productos Agregados");
     }
@@ -146,7 +148,5 @@ public class OrdenesController {
 
         return ResponseEntity.ok().body("Orden Cancelada");
     }
-
-
 
 }
