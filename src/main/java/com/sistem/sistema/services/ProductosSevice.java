@@ -6,9 +6,15 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sistem.sistema.entity.CategoriasEntity;
 import com.sistem.sistema.entity.ProductosEntity;
 import com.sistem.sistema.exception.NotFoundException;
 import com.sistem.sistema.repository.ProductosRepository;
@@ -26,6 +32,24 @@ public class ProductosSevice {
     public List<ProductosEntity> obtenerProductos(){
         
         return productosRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ProductosEntity> obtenerProductosPage(Integer page, Integer limit, String categoriaSearch){
+
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                                .withMatcher("nombre", new GenericPropertyMatcher().exact());
+
+        ProductosEntity producto = new ProductosEntity();
+        CategoriasEntity categoria = new CategoriasEntity();
+
+        if(categoriaSearch != null && !categoriaSearch.equals("")){
+            categoria.setNombre(categoriaSearch);
+        }
+
+        producto.setCategorias(categoria);
+                                
+        return productosRepository.findAll(Example.of(producto, matcher), PageRequest.of(page, limit));
     }
 
     @Transactional(readOnly = true)
