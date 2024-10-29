@@ -6,9 +6,15 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.ExampleMatcher.GenericPropertyMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.sistem.sistema.entity.CategoriasEntity;
 import com.sistem.sistema.entity.ProductosEntity;
 import com.sistem.sistema.exception.NotFoundException;
 import com.sistem.sistema.repository.ProductosRepository;
@@ -29,6 +35,24 @@ public class ProductosSevice {
     }
 
     @Transactional(readOnly = true)
+    public Page<ProductosEntity> obtenerProductosPage(Integer page, Integer limit, String categoriaSearch){
+
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                                .withMatcher("nombre", new GenericPropertyMatcher().exact());
+
+        ProductosEntity producto = new ProductosEntity();
+        CategoriasEntity categoria = new CategoriasEntity();
+
+        if(categoriaSearch != null && !categoriaSearch.equals("")){
+            categoria.setNombre(categoriaSearch);
+        }
+
+        producto.setCategorias(categoria);
+                                
+        return productosRepository.findAll(Example.of(producto, matcher), PageRequest.of(page, limit));
+    }
+
+    @Transactional(readOnly = true)
     public Optional<ProductosEntity> obtenerProductoPorId(Long productoId){
         return productosRepository.findProductoById(productoId);
     }
@@ -46,15 +70,20 @@ public class ProductosSevice {
     }
 
     @Transactional(readOnly = false)
-    public ProductosEntity editarProductos(ProductosEntity producto){
-        producto.setNombre(producto.getNombre());
-        producto.setPrecio(producto.getPrecio());
-        producto.setDescripcion(producto.getDescripcion());
-        
-        categoriasService.eliminarProductoCategoria(producto.getProductoId());
+    public ProductosEntity editarProductos(ProductosEntity producto, ProductosEntity productoEncontrado){
+        productoEncontrado.setNombre(producto.getNombre());
+        productoEncontrado.setPrecio(producto.getPrecio());
+        productoEncontrado.setDescripcion(producto.getDescripcion());
+        productoEncontrado.setPreparado(producto.getPreparado());
 
-        producto.setCategorias(producto.getCategorias());
-        return productosRepository.save(producto);
+        
+        if(!productoEncontrado.getCategorias().getCategoriaId().equals(producto.getCategorias().getCategoriaId())){
+            categoriasService.eliminarProductoCategoria(productoEncontrado.getProductoId());
+            productoEncontrado.setCategorias(producto.getCategorias());
+        }
+        
+
+        return productosRepository.save(productoEncontrado);
     }
 
     @Transactional(readOnly = false)

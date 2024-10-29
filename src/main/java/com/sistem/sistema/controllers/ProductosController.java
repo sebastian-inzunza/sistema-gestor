@@ -8,9 +8,8 @@ import com.sistem.sistema.entity.ProductosEntity;
 import com.sistem.sistema.exception.NotFoundException;
 import com.sistem.sistema.services.ProductosSevice;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,8 +30,14 @@ public class ProductosController {
     ProductosSevice productosSevice;
 
     @GetMapping("obtener")
-    public List<ProductosEntity> obtenerProductos() {
-        List<ProductosEntity> productos = productosSevice.obtenerProductos();
+    public Page<ProductosEntity> obtenerProductos(
+        @RequestParam(defaultValue = "0") Integer page,
+        @RequestParam(defaultValue = "10") Integer limit,
+        @RequestParam(required = false) String categoria
+    ) {
+
+
+        Page<ProductosEntity> productos = productosSevice.obtenerProductosPage(page, limit, categoria);
         return productos;
     }
 
@@ -65,15 +70,14 @@ public class ProductosController {
         }
 
       
-        productosSevice.editarProductos(productosEncontrados);
+        productosSevice.editarProductos(producto, productosEncontrados);
         
         return ResponseEntity.ok().body("Se editó el producto");
     }
     
-
     @PutMapping("estatus/{id}")
     public ResponseEntity<Object> putMethodName(@PathVariable Long id, @RequestParam(required = true) Boolean estatus) {
         productosSevice.cambiarEstatus(id, estatus);
-        return ResponseEntity.ok().body(estatus? "Producto Activado" :"Producto Desativado");
+        return ResponseEntity.ok().body(estatus? "Producto Activado" : "Producto Desativado");
     }
 }

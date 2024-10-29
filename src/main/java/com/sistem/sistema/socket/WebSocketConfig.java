@@ -12,7 +12,8 @@ public class WebSocketConfig implements WebSocketConfigurer{
 
     @Autowired
     private OrderWebSocketHandler orderWebSocketHandler;
-
+    
+    @SuppressWarnings("")
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(orderWebSocketHandler, "/socket/ordenes").setAllowedOrigins("*");        

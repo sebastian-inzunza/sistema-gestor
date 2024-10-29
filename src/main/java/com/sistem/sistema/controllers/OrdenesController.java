@@ -3,6 +3,9 @@ package com.sistem.sistema.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.data.domain.Page;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,11 +38,28 @@ public class OrdenesController {
     @Autowired
     OrderWebSocketHandler orderWebSocketHandler;
 
-    
     @GetMapping("")
     public List<OrdenesEntity> ObtenerOrdenes() {
         return ordenesService.ObtenerOrdenes();
     }
+
+    @GetMapping("paginado")
+    public ResponseEntity<Object> ObtenerOrdenesPaginado(
+        @RequestParam(defaultValue = "0") Integer page,
+        @RequestParam(defaultValue = "10") Integer limit,
+        @RequestParam(required = false) String estatus
+    ) {
+
+        OrdenesEntity orden = new OrdenesEntity();
+        if(estatus != null && !estatus.equals("")){
+            orden.setEstatus(estatus);
+        }
+
+        Page<OrdenesEntity> ordenesPaged = ordenesService.ObtenerOrdenesPaginado(orden, page, limit);
+        
+        return ResponseEntity.ok(ordenesPaged);
+    }
+    
 
     @PostMapping("crear")
     public ResponseEntity<Object> CrearOrden(@RequestBody OrdenesEntity orden) throws Exception {
@@ -58,7 +78,7 @@ public class OrdenesController {
 
         OrdenesEntity ordenCreada = ordenesService.CrearOrden(orden); 
         ordenesService.CrearProductosOrdenes(ordenCreada);
-        orderWebSocketHandler.notificarOrdenCreada();
+        
         
         return ResponseEntity.ok().body("Orden creada con folio " + orden.getNombre());
     }
@@ -73,7 +93,13 @@ public class OrdenesController {
 
         ordenEncontrada.setProductosOrden(orden.getProductosOrden());
         ordenEncontrada.setProductosOrdenEliminar(orden.getProductosOrdenEliminar());
-        ordenesService.EditarProductosOrdenes(ordenEncontrada);
+
+
+        try {
+            ordenesService.EditarProductosOrdenes(ordenEncontrada);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         
         return ResponseEntity.ok().body("Productos Agregados");
     }
@@ -91,6 +117,11 @@ public class OrdenesController {
     @PutMapping("/lista")
     public ResponseEntity<Object> OrdenLista( @RequestParam(required = true) Long ordenId) throws Exception {
         OrdenesEntity ordene = ordenesService.ObtenerPorId(ordenId).orElseThrow(()-> new NotFoundException("No se encontro la orden"));
+
+        if(!ordene.getEstatus().equals(OrdenEstatus.PREPARANDO.toString())){
+            throw new NotFoundException(String.format("La orden esta en estatus '%s', no se puede cambiar orden a lista", ordene.getEstatus()));
+        }
+
         ordenesService.CambiarEstatus(ordene.getOrdenId(), OrdenEstatus.LISTO.toString());
 
         if(ordene.getLlevar()){
@@ -117,7 +148,5 @@ public class OrdenesController {
 
         return ResponseEntity.ok().body("Orden Cancelada");
     }
-
-
 
 }
