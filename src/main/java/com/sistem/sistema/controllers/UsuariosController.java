@@ -9,13 +9,18 @@ import com.sistem.sistema.services.RolesService;
 import com.sistem.sistema.services.UsuarioService;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -124,5 +129,19 @@ public class UsuariosController {
         }
         usuarioService.EditarRolUsuario(usuarioEncontrado);
         return ResponseEntity.ok().body("Roles de usuarios editados");
+    }
+
+     @GetMapping("/me")
+    public ResponseEntity<Map<String, Object>> getUserInfo() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        List<String> roles = authorities.stream()
+                                       .map(GrantedAuthority::getAuthority)
+                                       .collect(Collectors.toList());
+        Map<String, Object> response = new HashMap<>();
+        response.put("username", username);
+        response.put("roles", roles);
+        return ResponseEntity.ok(response);
     }
 }
