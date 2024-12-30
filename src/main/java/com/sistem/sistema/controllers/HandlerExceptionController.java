@@ -20,7 +20,7 @@ public class HandlerExceptionController {
         NullPointerException.class,
         HttpMessageNotWritableException.class,
         NoHandlerFoundException.class,
-         NotFoundException.class
+        NotFoundException.class
     })
     public ResponseEntity<Error> notFoundeException(Exception ex){
         Error error = new Error();

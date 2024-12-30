@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,6 +19,8 @@ import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sistem.sistema.entity.UsuarioEntity;
+import com.sistem.sistema.exception.NotFoundException;
+import com.sistem.sistema.repository.UsuarioRepository;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -29,11 +32,15 @@ import jakarta.servlet.http.HttpServletResponse;
 import static com.sistem.sistema.security.TokenJwtConfig.*;
 
 public class JwtAuthentificationFilter extends UsernamePasswordAuthenticationFilter {
-
+    @Autowired
     private AuthenticationManager authenticationManager;
 
-    public JwtAuthentificationFilter(AuthenticationManager authenticationManager) {
+    
+    private final UsuarioRepository usuarioRepository;
+    
+    public JwtAuthentificationFilter(AuthenticationManager authenticationManager, UsuarioRepository usuarioRepository) {
         this.authenticationManager = authenticationManager;
+        this.usuarioRepository = usuarioRepository;
     }
 
 
@@ -69,23 +76,27 @@ public class JwtAuthentificationFilter extends UsernamePasswordAuthenticationFil
             String username = user.getUsername();
             Collection<? extends GrantedAuthority> roles = authResult.getAuthorities();
             
+            
             Claims claims = Jwts.claims()
-                .add("authorities", new ObjectMapper().writeValueAsString(roles))
-                .build();
-
+            .add("authorities", new ObjectMapper().writeValueAsString(roles))
+            .build();
+            
             String token = Jwts.builder()
-                .subject(username)
-                .signWith(SECRET_KEY)                              //6 horas de caducidad 
-                .expiration(new Date(System.currentTimeMillis() + (3600000 * 6)))
-                .issuedAt(new Date())
-                .claims(claims) 
-                .compact();
-
+            .subject(username)
+            .signWith(SECRET_KEY)                              //6 horas de caducidad 
+            .expiration(new Date(System.currentTimeMillis() + (3600000 * 6)))
+            .issuedAt(new Date())
+            .claims(claims) 
+            .compact();
+            
             response.addHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + token);
-
+            UsuarioEntity usuario = usuarioRepository.obtenerUsuarioPorEmail(username).orElseThrow(()-> new NotFoundException("No se encontro informacion del usuario"));
+            
             Map<String, Object> body = new HashMap<String, Object>();
             body.put("token", token);
             body.put("username", username);
+            body.put("name", String.format("%s %s", usuario.getNombre(), usuario.getApellidos()));
+            body.put("rol", roles);
             body.put("message", String.format("Hola %s haz iniciado sesion con exito", username));
 
             response.getWriter().write(new ObjectMapper().writeValueAsString(body));

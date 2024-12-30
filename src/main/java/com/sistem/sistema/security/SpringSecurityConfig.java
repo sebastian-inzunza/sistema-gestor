@@ -23,6 +23,7 @@ import org.springframework.web.filter.CorsFilter;
 
 import com.sistem.sistema.entity.EnpointsEntity;
 import com.sistem.sistema.entity.RolesEntity;
+import com.sistem.sistema.repository.UsuarioRepository;
 import com.sistem.sistema.security.filter.JwtAuthentificationFilter;
 import com.sistem.sistema.security.filter.JwtValidationFilter;
 import com.sistem.sistema.services.EndpointsService;
@@ -35,6 +36,10 @@ public class SpringSecurityConfig{
 
     @Autowired
     EndpointsService endpointsService;
+
+    @Autowired
+    UsuarioRepository usuarioRepository;
+ 
 
     @Bean
     AuthenticationManager authenticationManager () throws Exception{
@@ -70,7 +75,7 @@ public class SpringSecurityConfig{
                     .anyRequest().authenticated();
                 }
             )
-            .addFilter(new JwtAuthentificationFilter(authenticationManager()))
+            .addFilter(new JwtAuthentificationFilter(authenticationManager(), usuarioRepository))
             .addFilter(new JwtValidationFilter(authenticationManager()))
             .csrf(config -> config.disable())
             .cors(cors -> cors.configurationSource(configurationSource()))
