@@ -96,6 +96,7 @@ public class JwtAuthentificationFilter extends UsernamePasswordAuthenticationFil
             body.put("token", token);
             body.put("username", username);
             body.put("name", String.format("%s %s", usuario.getNombre(), usuario.getApellidos()));
+            body.put("id", usuario.getUsuarioId());
             body.put("rol", roles);
             body.put("message", String.format("Hola %s haz iniciado sesion con exito", username));
 

@@ -240,7 +240,8 @@ public class OrdenesService {
         
         ExampleMatcher matcher = ExampleMatcher.matching()
                                 .withMatcher("total", new GenericPropertyMatcher().ignoreCase())
-                                .withMatcher("estatus", new GenericPropertyMatcher().exact());
+                                .withMatcher("estatus", new GenericPropertyMatcher().exact())
+                                .withMatcher("usuarioId", new GenericPropertyMatcher().exact());
 
         Page<OrdenesEntity> ordenes = ordenesRepository.findAll(Example.of(ordenSearch, matcher),PageRequest.of(page, limit));
 

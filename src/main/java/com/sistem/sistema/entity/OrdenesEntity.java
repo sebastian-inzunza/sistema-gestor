@@ -33,7 +33,7 @@ public class OrdenesEntity {
     private String nombre;
 
     @Basic
-    @Column(name = "usuario_id")
+    @Column(name = "usuario_id") //MESERO ATIENDE
     private Long usuarioId;
 
     @Basic

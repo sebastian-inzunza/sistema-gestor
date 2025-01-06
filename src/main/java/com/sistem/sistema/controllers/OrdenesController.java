@@ -47,10 +47,16 @@ public class OrdenesController {
     public ResponseEntity<Object> ObtenerOrdenesPaginado(
         @RequestParam(defaultValue = "0") Integer page,
         @RequestParam(defaultValue = "10") Integer limit,
-        @RequestParam(required = false) String estatus
+        @RequestParam(required = false) String estatus,
+        @RequestParam(required =  false) Integer userId
     ) {
 
         OrdenesEntity orden = new OrdenesEntity();
+        
+        if(userId != null && userId >0){
+            orden.setUsuarioId((long) userId);
+        }
+
         if(estatus != null && !estatus.equals("")){
             orden.setEstatus(estatus);
         }
