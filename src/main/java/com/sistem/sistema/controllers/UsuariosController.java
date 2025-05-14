@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sistem.sistema.entity.RolesEntity;
 import com.sistem.sistema.entity.UsuarioEntity;
 import com.sistem.sistema.exception.NotFoundException;
+import com.sistem.sistema.models.UsuarioDTO;
 import com.sistem.sistema.services.RolesService;
 import com.sistem.sistema.services.UsuarioService;
 
@@ -42,7 +43,7 @@ public class UsuariosController {
 
     @Autowired
     UsuarioService usuarioService;
-
+    UsuarioDTO usuarioDTO;
     @Autowired
     RolesService rolesService;
 

@@ -1,7 +1,7 @@
 package com.sistem.sistema.security;
 
 import java.util.Arrays;
-import java.util.List;
+// import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -21,8 +21,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import com.sistem.sistema.entity.EnpointsEntity;
-import com.sistem.sistema.entity.RolesEntity;
+// import com.sistem.sistema.entity.EnpointsEntity;
+// import com.sistem.sistema.entity.RolesEntity;
 import com.sistem.sistema.repository.UsuarioRepository;
 import com.sistem.sistema.security.filter.JwtAuthentificationFilter;
 import com.sistem.sistema.security.filter.JwtValidationFilter;
@@ -53,20 +53,20 @@ public class SpringSecurityConfig{
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
-        List<EnpointsEntity> endpoints = endpointsService.ObtenerEndpoints();
+        // List<EnpointsEntity> endpoints = endpointsService.ObtenerEndpoints();
         
         return http.authorizeHttpRequests(
             (authz)->  {
-                endpoints.forEach(path ->{
-                    if(!path.getRoles().isEmpty()){
-                        String[] roles = path.getRoles().stream().map(RolesEntity::getNombre)
-                                        .map(name->{
-                                            return name.split("_")[1]; 
-                                        })
-                                        .toArray(String[]::new);
-                        authz.requestMatchers(HttpMethod.valueOf(path.getMethod()), path.getUrl()).hasAnyRole(roles);
-                    }
-                });
+                // endpoints.forEach(path ->{
+                //     if(!path.getRoles().isEmpty()){
+                //         String[] roles = path.getRoles().stream().map(RolesEntity::getNombre)
+                //                         .map(name->{
+                //                             return name.split("_")[1]; 
+                //                         })
+                //                         .toArray(String[]::new);
+                //         authz.requestMatchers(HttpMethod.valueOf(path.getMethod()), path.getUrl()).hasAnyRole(roles);
+                //     }
+                // });
                 authz
                     .requestMatchers( "/socket/ordenes").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/usuario/crear").permitAll()

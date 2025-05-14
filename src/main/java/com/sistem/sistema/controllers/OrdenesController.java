@@ -1,5 +1,6 @@
 package com.sistem.sistema.controllers;
 
+import java.sql.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +65,20 @@ public class OrdenesController {
         Page<OrdenesEntity> ordenesPaged = ordenesService.ObtenerOrdenesPaginado(orden, page, limit);
         
         return ResponseEntity.ok(ordenesPaged);
+    }
+    
+
+    @GetMapping("/dia")
+    public ResponseEntity<Object> ObtenerOrdenesPorDia(
+            @RequestParam(required = true) Date date,
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) String status
+        ) {
+        try {
+            return ResponseEntity.ok().body(ordenesService.ObtenerOrdenesPorDiaDinamic(date, userId, status));
+        } catch (Exception e) {
+            throw new NotFoundException("Error al obtener ordenes en api/ordenes/dia");
+        }
     }
     
 

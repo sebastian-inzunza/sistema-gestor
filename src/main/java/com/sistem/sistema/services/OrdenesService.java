@@ -3,7 +3,7 @@ package com.sistem.sistema.services;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.time.LocalDate;
-import java.util.Date;
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +25,10 @@ import com.sistem.sistema.entity.UsuarioEntity;
 import com.sistem.sistema.repository.OrdenesProductosRepository;
 import com.sistem.sistema.repository.OrdenesRepository;
 import com.sistem.sistema.socket.OrderWebSocketHandler;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.Query;
+
 import com.sistem.sistema.exception.NotFoundException;
 
 
@@ -43,10 +47,14 @@ public class OrdenesService {
     @Autowired 
     ProductosSevice productosSevice;
 
+    @Autowired
+    EntityManager BDConnection;
+
     
     OrderWebSocketHandler orderWebSocketHandler;
-
     OrdenEstatus ordenEstatus;
+
+    static final String SQL ="SELECT * FROM ordenes <WHERE>";
 
     @Transactional(readOnly = true)
     public String GenerarFolio() throws ParseException{
@@ -80,7 +88,7 @@ public class OrdenesService {
         UsuarioEntity usuario = usuarioService.ObtenerUsuarioEmail((String) auth.getPrincipal()).orElseThrow(() -> new NotFoundException("No se encontro id de usuario"));
         orden.setTotal(0D);
         orden.setUsuarioId(usuario.getUsuarioId());
-        orden.setFecha(new Timestamp(new Date().getTime()));
+        orden.setFecha(new Timestamp(new java.util.Date().getTime()));
         orden.setEstatus(OrdenEstatus.ESPERANDO.toString());
         
         return ordenesRepository.save(orden);
@@ -91,9 +99,7 @@ public class OrdenesService {
 
         orden.getProductosOrden().forEach(ordenProducto->{
             ProductosEntity producto = productosSevice.obtenerProductoPorId(ordenProducto.getProductoId()).orElseThrow(() -> new NotFoundException("Producto no encontrado"));
-
             
-
             ordenProducto.setOrdenId(orden.getOrdenId());
             ordenProducto.setProductoId(producto.getProductoId());
             ordenProducto.setPrecio(producto.getPrecio());
@@ -119,7 +125,6 @@ public class OrdenesService {
         }
 
     }
-    
     
     @Transactional(readOnly = false)
     public void EditarProductosOrdenes(OrdenesEntity orden) throws Exception{
@@ -250,6 +255,25 @@ public class OrdenesService {
             orden.setProductosOrden(productos); 
         });
         return ordenes;
+    }
+
+
+    @Transactional(readOnly = true)
+    @SuppressWarnings("unchecked")
+    public List<OrdenesEntity> ObtenerOrdenesPorDiaDinamic(Date date, Long userId, String status ){
+        String WHERE_SENTENCE = " WHERE CAST(fecha as DATE) = '"+ date + "' ";
+
+        WHERE_SENTENCE = (userId != null && userId != 0)? WHERE_SENTENCE + " AND usuario_id = " + userId : WHERE_SENTENCE;
+        WHERE_SENTENCE = (status != null && !status.equals(""))? WHERE_SENTENCE + " AND estatus = '" + status + "'" : WHERE_SENTENCE;
+
+        System.out.println(WHERE_SENTENCE);
+        String SQL_FINAL = SQL.replace("<WHERE>", WHERE_SENTENCE);
+
+        Query result = BDConnection.createNativeQuery(SQL_FINAL, OrdenesEntity.class);
+        List<OrdenesEntity> ordenes = result.getResultList();
+
+        return ordenes;
+
     }
 }
 
