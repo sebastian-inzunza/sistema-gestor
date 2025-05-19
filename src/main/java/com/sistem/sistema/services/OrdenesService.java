@@ -85,13 +85,26 @@ public class OrdenesService {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
+        this.ProductsExist(orden); // Validate if all product exist
+
         UsuarioEntity usuario = usuarioService.ObtenerUsuarioEmail((String) auth.getPrincipal()).orElseThrow(() -> new NotFoundException("No se encontro id de usuario"));
+
         orden.setTotal(0D);
         orden.setUsuarioId(usuario.getUsuarioId());
         orden.setFecha(new Timestamp(new java.util.Date().getTime()));
         orden.setEstatus(OrdenEstatus.ESPERANDO.toString());
         
         return ordenesRepository.save(orden);
+    }
+
+    @Transactional(readOnly = true)
+    public void ProductsExist(OrdenesEntity order){
+        order.getProductosOrden().forEach(ordenProducto -> {
+            //if product is not found
+            if(!productosSevice.isProductExist(ordenProducto.getProductoId())){
+                throw new NotFoundException("Producto no encontrado");
+            }
+        });
     }
 
     @Transactional(readOnly = false)
@@ -205,8 +218,7 @@ public class OrdenesService {
         orden.setEstatus(estatus);
         ordenesRepository.save(orden);
     }
-
-    
+   
     @Transactional(readOnly = false)
     public void CambiarEstatus( OrdenesEntity orden, String estatus){
 
@@ -257,7 +269,6 @@ public class OrdenesService {
         return ordenes;
     }
 
-
     @Transactional(readOnly = true)
     @SuppressWarnings("unchecked")
     public List<OrdenesEntity> ObtenerOrdenesPorDiaDinamic(Date date, Long userId, String status ){
@@ -273,6 +284,8 @@ public class OrdenesService {
         List<OrdenesEntity> ordenes = result.getResultList();
 
         return ordenes;
+
+        
 
     }
 }

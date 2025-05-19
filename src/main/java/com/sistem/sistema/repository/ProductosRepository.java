@@ -12,5 +12,8 @@ public interface ProductosRepository extends JpaRepository<ProductosEntity, Long
 
     @Query("SELECT pro FROM ProductosEntity pro WHERE pro.productoId =:productoId")
     Optional<ProductosEntity> findProductoById(@Param("productoId") Long productoId);
+
     boolean existsByNombre(String nombre);
+
+
 } 

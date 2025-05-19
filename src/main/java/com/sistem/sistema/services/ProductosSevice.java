@@ -62,6 +62,11 @@ public class ProductosSevice {
         return productosRepository.existsByNombre(nombre);
     }
 
+    @Transactional(readOnly = true)
+    public boolean isProductExist(Long productId){
+        return productosRepository.findProductoById(productId).isPresent();
+    }
+
     @Transactional(readOnly = false)
     public ProductosEntity crearProductos(ProductosEntity producto){
         producto.setFecha(new Timestamp(new Date().getTime()));

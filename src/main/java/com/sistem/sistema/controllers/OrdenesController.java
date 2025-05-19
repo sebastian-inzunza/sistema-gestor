@@ -95,8 +95,8 @@ public class OrdenesController {
             throw new NotFoundException(String.format("ya existe una orden activa con el nombre '%s', ingresa otro nombre", orden.getNombre()));
         }
         
-        
 
+        
         OrdenesEntity ordenCreada = ordenesService.CrearOrden(orden); 
         ordenesService.CrearProductosOrdenes(ordenCreada);
         
