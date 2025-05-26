@@ -3,6 +3,7 @@ package com.sistem.sistema.entity;
 
 import java.sql.Timestamp;
 
+import org.hibernate.annotations.ColumnDefault;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -38,16 +39,19 @@ public class ProductosEntity {
     private String nombre;
 
     @Basic
-    @Column(name = "precio")
+    @Column(name = "precio")        
+    @ColumnDefault("0.0")
     private Double precio;
 
     @Basic
     @Column(name = "costo")
+    @ColumnDefault("0.0")
     private Double costo;
 
     @Basic
     @Column(name = "margen")
-    private Integer margen;
+    @ColumnDefault("0.0")
+    private Double margen;
 
     @Basic
     @Column(name = "descripcion")
@@ -67,6 +71,7 @@ public class ProductosEntity {
 
     @Basic
     @Column(name = "preparado")
+    @ColumnDefault("false")
     private Boolean preparado;
 
     @JsonIgnoreProperties({"productos", "handler", "hibernateLazyInitializer"})

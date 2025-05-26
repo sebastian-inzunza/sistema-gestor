@@ -37,6 +37,7 @@ public class OrderWebSocketHandler extends TextWebSocketHandler {
     }
 
     public boolean notificarOrdenCreada() throws Exception{
+     
         for(WebSocketSession session: sessions){
             session.sendMessage(new TextMessage(getWaitingOrdersJson()));
         }
@@ -46,7 +47,7 @@ public class OrderWebSocketHandler extends TextWebSocketHandler {
 
     public boolean notificarCambioEstatusOrdenes(String orderId, String estatus) throws Exception{
         ordenesService.CambiarEstatus(Long.valueOf(orderId), estatus);
-
+        
         for(WebSocketSession session: sessions){
             session.sendMessage(new TextMessage(getWaitingOrdersJson()));
         }

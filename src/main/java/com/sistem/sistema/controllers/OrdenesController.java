@@ -95,12 +95,23 @@ public class OrdenesController {
             throw new NotFoundException(String.format("ya existe una orden activa con el nombre '%s', ingresa otro nombre", orden.getNombre()));
         }
         
-
-        
         OrdenesEntity ordenCreada = ordenesService.CrearOrden(orden); 
+        ordenCreada.setProductosOrden(orden.getProductosOrden());
         ordenesService.CrearProductosOrdenes(ordenCreada);
-        
-        
+
+        if(ordenesService.areProductosPreparados(orden.getOrdenId())){
+            //Si la orden tiene todos sus productos como previamente preparado (Agua, refrescos, postres) se manda directamente a orden lista 
+            ordenesService.CambiarEstatus(orden, OrdenEstatus.LISTO.toString());//Cambia a Listo y calcula total
+
+            if(orden.getLlevar()){ //Si la orden es para llevar automaticamente se cierra despues de estar lista
+                ordenesService.CambiarEstatus(orden, OrdenEstatus.CERRADO.toString());
+            }
+
+        }else{
+            //Revisar aqui si no hay sesiones escuchando el socket falla y no registra porductos ordenes
+            orderWebSocketHandler.notificarOrdenCreada();  //Si hay productos que son necesarios preararse en cocina, notifica una nueva orden en espera
+        }
+
         return ResponseEntity.ok().body("Orden creada con folio " + orden.getNombre());
     }
     
@@ -118,6 +129,14 @@ public class OrdenesController {
 
         try {
             ordenesService.EditarProductosOrdenes(ordenEncontrada);
+
+            //Todos los productos que se agregaron no es necesario mandar a preparacion 
+            if(ordenesService.areProductosPreparados(ordenId)){
+                ordenesService.CambiarEstatus(ordenId, OrdenEstatus.LISTO.toString());
+            }else{
+                ordenesService.CambiarEstatus(ordenEncontrada, OrdenEstatus.ESPERANDO.toString());
+                orderWebSocketHandler.notificarOrdenCreada();  //Si hay productos que son necesarios preararse en cocina, notifica una nueva orden en espera
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

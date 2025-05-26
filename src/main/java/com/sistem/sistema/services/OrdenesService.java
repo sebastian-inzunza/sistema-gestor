@@ -50,8 +50,8 @@ public class OrdenesService {
     @Autowired
     EntityManager BDConnection;
 
-    
     OrderWebSocketHandler orderWebSocketHandler;
+
     OrdenEstatus ordenEstatus;
 
     static final String SQL ="SELECT * FROM ordenes <WHERE>";
@@ -116,26 +116,14 @@ public class OrdenesService {
             ordenProducto.setOrdenId(orden.getOrdenId());
             ordenProducto.setProductoId(producto.getProductoId());
             ordenProducto.setPrecio(producto.getPrecio());
+            ordenProducto.setCosto(producto.getCosto());
+            ordenProducto.setMargen(productosSevice.calcularMargen(producto.getPrecio(), producto.getCosto()));
             ordenProducto.setProducto(producto.getNombre());
-            ordenProducto.setAtendido(false);
+            ordenProducto.setAtendido(false); //Revisar aca
             ordenProducto.setPreparado(producto.getPreparado());
 
             ordenesProductosRepository.save(ordenProducto);
         });
-
-        List<OrdenesProductosEntity> isPreparados = ordenesProductosRepository.obtenerInformacionPreparado(orden.getOrdenId());
-
-        if(isPreparados.isEmpty()){
-            //Si la orden tiene todos sus productos como previamente preparado (Agua, refrescos, postres) se manda direcatmante a orden lista 
-            this.CambiarEstatus(orden, OrdenEstatus.LISTO.toString());//Cambia a Listo y calcula total
-
-            if(orden.getLlevar()){ //Si la orden es para llevar automaticamente se cierra despues de estar lista
-                this.CambiarEstatus(orden, OrdenEstatus.CERRADO.toString());
-            }
-
-        }else{
-            orderWebSocketHandler.notificarOrdenCreada();  //Si hay productos que son necesarios preararse en cocina, notifica una nueva orden en espera
-        }
 
     }
     
@@ -170,16 +158,7 @@ public class OrdenesService {
             
         });
     
-        List<OrdenesProductosEntity> isPreparados = ordenesProductosRepository.obtenerInformacionPreparado(orden.getOrdenId());
-        //Todos los productos que se agregaron no es necesario mandar a preparacion 
-        if(isPreparados.isEmpty()){
-            this.CambiarEstatus(orden.getOrdenId(), OrdenEstatus.LISTO.toString());
-        }else{
-            orden.setEstatus(OrdenEstatus.ESPERANDO.toString());
-            ordenesRepository.save(orden);
-            orderWebSocketHandler.notificarOrdenCreada();  //Si hay productos que son necesarios preararse en cocina, notifica una nueva orden en espera
-
-        }
+        
 
     }
     
@@ -287,6 +266,11 @@ public class OrdenesService {
 
         
 
+    }
+
+    @Transactional(readOnly = true)
+    public boolean areProductosPreparados(Long orderId){
+        return ordenesProductosRepository.obtenerInformacionPreparado(orderId).isEmpty();
     }
 }
 
