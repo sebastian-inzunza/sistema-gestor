@@ -26,7 +26,6 @@ import org.springframework.web.filter.CorsFilter;
 import com.sistem.sistema.repository.UsuarioRepository;
 import com.sistem.sistema.security.filter.JwtAuthentificationFilter;
 import com.sistem.sistema.security.filter.JwtValidationFilter;
-import com.sistem.sistema.services.EndpointsService;
 
 @Configuration
 public class SpringSecurityConfig{
@@ -34,8 +33,8 @@ public class SpringSecurityConfig{
     @Autowired
     AuthenticationConfiguration authenticationConfiguration;
 
-    @Autowired
-    EndpointsService endpointsService;
+    // @Autowired
+    // EndpointsService endpointsService;
 
     @Autowired
     UsuarioRepository usuarioRepository;

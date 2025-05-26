@@ -47,3 +47,33 @@ public class CategoriasEntity {
     @OneToMany(mappedBy = "categorias")
     List<ProductosEntity> productos;
 }
+
+/*
+ * [{ 
+ *      id:1,
+ *      comment: "HOLA"
+ *      tags[]: ["Java", "c++"]
+ * },
+ * { 
+ *      id:2,
+ *      comment: "HOLA"
+ *      tags[]: ["python", "c++"]
+ * }]
+
+[
+    {
+        id: "DAVO"
+        tags[]:["Java", "c++"]
+    },
+    {
+        id: "YOVA"
+        tags[]:["python", "c++"]
+    }
+]
+
+[
+    [1, "DAVO"],
+    [2, "YOVA]
+]
+
+ */

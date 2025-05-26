@@ -69,8 +69,12 @@ public class ProductosSevice {
 
     @Transactional(readOnly = false)
     public ProductosEntity crearProductos(ProductosEntity producto){
+        int margen = this.calcularMargen(producto.getPrecio(),producto.getCosto());
+
+        producto.setMargen(margen);
         producto.setFecha(new Timestamp(new Date().getTime()));
         producto.setEstatus(true);
+
         return productosRepository.save(producto);
     }
 
@@ -78,6 +82,9 @@ public class ProductosSevice {
     public ProductosEntity editarProductos(ProductosEntity producto, ProductosEntity productoEncontrado){
         productoEncontrado.setNombre(producto.getNombre());
         productoEncontrado.setPrecio(producto.getPrecio());
+        productoEncontrado.setCosto(producto.getCosto());
+        productoEncontrado.setMargen(this.calcularMargen(producto.getPrecio(), producto.getCosto()));
+        
         productoEncontrado.setDescripcion(producto.getDescripcion());
         productoEncontrado.setPreparado(producto.getPreparado());
 
@@ -99,5 +106,8 @@ public class ProductosSevice {
         return productosRepository.save(producto);
     }
 
-
+    @Transactional(readOnly = true)
+    public int calcularMargen( Double precio, Double costo){
+        return (int)( (precio - costo) / precio * 100);
+    }
 }

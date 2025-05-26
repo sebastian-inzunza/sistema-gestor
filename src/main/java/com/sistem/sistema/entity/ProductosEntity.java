@@ -3,6 +3,7 @@ package com.sistem.sistema.entity;
 
 import java.sql.Timestamp;
 
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Basic;
@@ -13,7 +14,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
@@ -41,6 +42,14 @@ public class ProductosEntity {
     private Double precio;
 
     @Basic
+    @Column(name = "costo")
+    private Double costo;
+
+    @Basic
+    @Column(name = "margen")
+    private Integer margen;
+
+    @Basic
     @Column(name = "descripcion")
     private String descripcion;
 
@@ -61,7 +70,7 @@ public class ProductosEntity {
     private Boolean preparado;
 
     @JsonIgnoreProperties({"productos", "handler", "hibernateLazyInitializer"})
-    @OneToOne()
+    @ManyToOne()
     @JoinTable(
         name = "productos_categorias",
         joinColumns = @JoinColumn(name = "producto_id"),
