@@ -174,7 +174,11 @@ public class OrdenesService {
 
     @Transactional(readOnly = true)
     public Optional<OrdenesEntity> ObtenerPorId(Long id){
-        return ordenesRepository.ObtenerPorId(id);
+        Optional<OrdenesEntity> orden = ordenesRepository.ObtenerPorId(id);
+        if(orden.isPresent())
+            orden.get().setProductosOrden(ordenesProductosRepository.obtenerProductos(id));
+        
+        return orden; 
     }
 
     @Transactional(readOnly = false)
@@ -197,7 +201,7 @@ public class OrdenesService {
         orden.setEstatus(estatus);
         ordenesRepository.save(orden);
     }
-   
+
     @Transactional(readOnly = false)
     public void CambiarEstatus( OrdenesEntity orden, String estatus){
 

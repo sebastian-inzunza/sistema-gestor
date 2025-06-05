@@ -44,6 +44,14 @@ public class OrdenesController {
         return ordenesService.ObtenerOrdenes();
     }
 
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Object> ObtenerOrdenId(@PathVariable Long id) {
+        OrdenesEntity ordenFound = ordenesService.ObtenerPorId(id).orElseThrow(() -> new NotFoundException("Orden no encontrada"));
+        return ResponseEntity.ok(ordenFound);
+    }
+    
+
     @GetMapping("paginado")
     public ResponseEntity<Object> ObtenerOrdenesPaginado(
         @RequestParam(defaultValue = "0") Integer page,
